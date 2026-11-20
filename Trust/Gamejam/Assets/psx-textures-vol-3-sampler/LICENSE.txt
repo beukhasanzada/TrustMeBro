@@ -1,0 +1,30 @@
+PSX Textures Vol. 3 - License
+
+Copyright (c) 2026 fcidade
+
+One license covers the buyer and the people working with them on the
+buyer's projects (teammates, contractors). It does not cover other
+companies or other buyers.
+
+You CAN:
+- Use these textures in personal and commercial projects: games, apps,
+  videos, prototypes.
+- Use them in as many projects as you want. No royalties, no extra fees.
+- Modify them, or convert them to another format, for use in your own
+  projects.
+- Ship them inside your project's files, for example a game build.
+
+You CAN'T:
+- Sell, share or redistribute the texture files themselves, original or
+  modified, on their own or as part of an asset pack, texture library or
+  template.
+- Put the texture files in a public repository (GitHub and similar). A
+  built game or app that uses them can be public.
+- Claim the textures as your own creation.
+
+The source materials are CC0 (ambientCG, see CREDITS.txt). This license
+covers the converted files in this pack, not the original materials.
+
+Credit is not required, but it is appreciated: "Textures by fcidade".
+
+The textures are provided "as is", without warranty of any kind.

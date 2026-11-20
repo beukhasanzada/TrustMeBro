@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecb0b304df458774aaba47be6a9e249c, type: 3}
+  m_Name: DefaultPlayerMovementSettings
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementSettings
+  walkSpeed: 11
+  sprintSpeed: 16
+  crouchSpeed: 5
+  groundAcceleration: 90
+  groundFriction: 60
+  groundOverspeedDecay: 10
+  groundOverspeedTurnRate: 360
+  maxSlopeAngle: 46
+  airAcceleration: 45
+  airControl: 0.8
+  airSteerRate: 160
+  airOverspeedDecay: 0
+  gravity: 32
+  fallGravityMultiplier: 1.15
+  maxFallSpeed: 60
+  maxHorizontalSpeed: 75
+  jumpHeight: 2.4
+  jumpBufferTime: 0.12
+  coyoteTime: 0.1
+  groundLockAfterJump: 0.12
+  bhopWindow: 0.1
+  bhopSpeedGain: 0.75
+  bhopMaxSpeed: 28
+  bhopMinSpeed: 8
+  autoBhop: 1
+  standHeight: 1.8
+  lowHeight: 1
+  slideMinStartSpeed: 7
+  slideEntryBoost: 3
+  slideBoostCeiling: 20
+  slideFriction: 3.5
+  slideStopSpeed: 4
+  slideSlopeInfluence: 1
+  slideSteerRate: 60
+  slideJumpMomentum: 1
+  dashSpeed: 34
+  dashDuration: 0.18
+  dashCooldown: 0.35
+  dashBufferTime: 0.1
+  airDashCount: 2
+  dashKeepsEntryMomentum: 1
+  dashExitSpeed: 18
+  dashGravityScale: 0
+  dashJumpMomentum: 1
+  dashBlockedThreshold: 0.35
+  wallCheckDistance: 0.6
+  wallMaxNormalY: 0.3
+  wallRunMinSpeed: 9
+  wallRunMinHeight: 1
+  wallRunSpeed: 16
+  wallRunAcceleration: 20
+  wallRunSpeedDecay: 1
+  wallRunGravityScale: 0.2
+  wallRunMaxEntryUpSpeed: 4
+  wallRunMaxEntryFallSpeed: 2
+  wallRunMaxDuration: 1.6
+  wallReentryCooldown: 0.6
+  wallStickSpeed: 2
+  wallRunRequiresInput: 1
+  wallJumpAwaySpeed: 9
+  wallJumpUpSpeed: 10
