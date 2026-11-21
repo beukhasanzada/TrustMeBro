@@ -18,12 +18,12 @@ MonoBehaviour:
   pickupPrefab: {fileID: 2408077191949057883, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
   fireMode: 0
   roundsPerMinute: 135
-  damagePerPellet: 11
+  damagePerPellet: 20
   pelletsPerShot: 8
   spreadDegrees: 6.5
   range: 42
   magazineCapacity: 3
-  startingReserve: 18
+  startingReserve: 500
   reloadSeconds: 1.8000001
   shootSfx: {fileID: 8300000, guid: 1fc2f19539db24f4693a43a720ce4c7f, type: 3}
   reloadSfx: {fileID: 8300000, guid: f40b4cc79d2017e4bbd90562f344ee35, type: 3}

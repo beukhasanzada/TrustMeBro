@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04225b48ced140e9ac66ad6fc3e18160, type: 3}
+  m_Name: AssaultRifle
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Assault Rifle
+  weaponType: 3
+  viewModel: {fileID: 1205038738887758992, guid: e4f5a6b7c8d940112233445566778804, type: 3}
+  pickupPrefab: {fileID: 8472788880770097467, guid: e4f5a6b7c8d940112233445566778805, type: 3}
+  fireMode: 1
+  roundsPerMinute: 600
+  damagePerPellet: 28
+  pelletsPerShot: 1
+  spreadDegrees: 1.2
+  range: 100
+  magazineCapacity: 30
+  startingReserve: 3000
+  reloadSeconds: 2.966667
+  shootSfx: {fileID: 8300000, guid: 145c3910574afe24d8cf0c28bf63a2fd, type: 3}
+  reloadSfx: {fileID: 8300000, guid: 948190f0eeabaaf42a5984da64f21e8e, type: 3}
+  recoil:
+    cameraPitch: 1.25
+    cameraYaw: 0.45
+    viewModelPitch: 3.4
+    viewModelRoll: 1.3
+    kickbackDistance: 0.036
+    kickSpeed: 42
+    returnSpeed: 12
+    maxStack: 3

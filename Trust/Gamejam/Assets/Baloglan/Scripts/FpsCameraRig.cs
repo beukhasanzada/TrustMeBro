@@ -1,5 +1,7 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(10)]
 [DisallowMultipleComponent]
@@ -29,6 +31,14 @@ public sealed class FpsCameraRig : MonoBehaviour
     [SerializeField, Min(0f)] float sprintFovBoost = 6f;
     [SerializeField, Min(0f)] float dashFovBoost = 12f;
 
+    [Header("Aim Zoom")]
+    [SerializeField, Min(0f)] float aimFovReduction = 20f;
+    [SerializeField, Min(1f)] float aimZoomSpeed = 16f;
+    InputAction aimAction = new InputAction("Aim", InputActionType.Button, "<Mouse>/rightButton");
+
+    public bool IsAiming { get; private set; }
+    public event Action<bool> AimChanged;
+
     Vector3 restPosition;
     Vector2 lookDegrees;
     Vector2 sway;
@@ -52,11 +62,37 @@ public sealed class FpsCameraRig : MonoBehaviour
 
         restPosition = transform.localPosition;
         yaw = orientation.localEulerAngles.y;
+        GameSettings.EnsureLoaded();
+    }
+
+    void OnEnable()
+    {
+        aimAction.Enable();
+    }
+
+    void OnDisable()
+    {
+        aimAction.Disable();
+        if (IsAiming)
+        {
+            IsAiming = false;
+            AimChanged?.Invoke(false);
+        }
     }
 
     void Update()
     {
-        float sensitivity = motor.LookUsesGamepad ? gamepadDegreesPerSecond * Time.deltaTime : mouseSensitivity;
+        bool nowAiming = Cursor.lockState == CursorLockMode.Locked && aimAction.IsPressed();
+        if (nowAiming != IsAiming)
+        {
+            IsAiming = nowAiming;
+            AimChanged?.Invoke(IsAiming);
+        }
+
+        float aimMult = IsAiming ? GameSettings.AimSensitivityMultiplier : 1f;
+        float sensitivity = motor.LookUsesGamepad
+            ? gamepadDegreesPerSecond * Time.deltaTime * aimMult
+            : mouseSensitivity * GameSettings.MouseSensitivity * aimMult;
         lookDegrees = motor.LookInput * sensitivity;
         yaw = Mathf.Repeat(yaw + lookDegrees.x, 360f);
         pitch = Mathf.Clamp(pitch - lookDegrees.y, -maxPitch, maxPitch);
@@ -101,6 +137,8 @@ public sealed class FpsCameraRig : MonoBehaviour
             * Quaternion.Euler(recoilPitch + sway.y, WeaponRecoilAngles.y - sway.x, roll);
 
         float fovBoost = motor.IsDashing ? dashFovBoost : motor.IsSprinting ? sprintFovBoost : 0f;
-        fpsCamera.Lens.FieldOfView = Mathf.Lerp(fpsCamera.Lens.FieldOfView, baseFov + fovBoost, blend);
+        float targetFov = Mathf.Max(30f, GameSettings.Fov + fovBoost - (IsAiming ? aimFovReduction : 0f));
+        float fovBlend = 1f - Mathf.Exp(-aimZoomSpeed * dt);
+        fpsCamera.Lens.FieldOfView = Mathf.Lerp(fpsCamera.Lens.FieldOfView, targetFov, fovBlend);
     }
 }

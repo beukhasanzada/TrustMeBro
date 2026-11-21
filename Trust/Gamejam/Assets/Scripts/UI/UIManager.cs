@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(PauseController))]
 public class UIManager : MonoBehaviour
 {
-    private enum ScreenState { Playing, Paused, Dead, Escaped }
+    private enum ScreenState { Playing, Paused, Settings, Dead, Escaped }
 
     [Header("References (auto-found if empty)")]
     [SerializeField] private RigidbodyFpsController fpsController;
@@ -38,13 +38,23 @@ public class UIManager : MonoBehaviour
 
     private VisualElement hudRoot;
     private VisualElement pauseRoot;
+    private VisualElement settingsRoot;
     private VisualElement deathRoot;
     private VisualElement escapeRoot;
 
     private Button btnResume;
+    private Button btnSettingsBack;
     private Button btnRetry;
     private Button btnEscapeNext;
     private Button btnEscapeMenu;
+    private Slider sliderMouseSens;
+    private Slider sliderAimSens;
+    private Slider sliderFov;
+    private Slider sliderVolume;
+    private Label valMouseSens;
+    private Label valAimSens;
+    private Label valFov;
+    private Label valVolume;
     private Label escapeLine1;
     private Label escapeLine2;
     private VisualElement escapeActions;
@@ -53,6 +63,7 @@ public class UIManager : MonoBehaviour
     private Coroutine escapeRoutine;
 
     public bool CanTogglePause => state == ScreenState.Playing || state == ScreenState.Paused;
+    public bool IsSettingsOpen => state == ScreenState.Settings;
 
     private void Awake()
     {
@@ -76,6 +87,7 @@ public class UIManager : MonoBehaviour
 
         hudRoot = root.Q<VisualElement>("hud-root");
         pauseRoot = root.Q<VisualElement>("pause-root");
+        settingsRoot = root.Q<VisualElement>("settings-root");
         deathRoot = root.Q<VisualElement>("death-root");
         escapeRoot = root.Q<VisualElement>("escape-root");
 
@@ -90,11 +102,17 @@ public class UIManager : MonoBehaviour
         Button btnRestart = root.Q<Button>("btn-restart");
         if (btnRestart != null) btnRestart.clicked += RestartActiveScene;
 
+        Button btnSettings = root.Q<Button>("btn-settings");
+        if (btnSettings != null) btnSettings.clicked += OpenSettings;
+
         Button btnPauseMenu = root.Q<Button>("btn-pause-mainmenu");
         if (btnPauseMenu != null) btnPauseMenu.clicked += () => LoadSceneSafe(mainMenuSceneName);
 
         Button btnQuit = root.Q<Button>("btn-quit");
         if (btnQuit != null) btnQuit.clicked += QuitGame;
+
+        // Settings controls
+        SetupSettingsUI(root);
 
         // Death buttons
         btnRetry = root.Q<Button>("btn-retry");
@@ -138,6 +156,8 @@ public class UIManager : MonoBehaviour
     public void AddBuff(string buffName, Sprite icon = null) => hudController.AddBuff(buffName, icon);
     public void RemoveBuff(string buffName) => hudController.RemoveBuff(buffName);
     public void SetCrosshairEnemy(bool isEnemy) => hudController.SetCrosshairEnemy(isEnemy);
+    public void SetBossBarVisible(bool visible, string title = "BOSS") => hudController.SetBossBarVisible(visible, title);
+    public void SetBossHealthNormalized(float normalized01) => hudController.SetBossHealthNormalized(normalized01);
 
     public void ShowDeath()
     {
@@ -173,12 +193,90 @@ public class UIManager : MonoBehaviour
 
     // ------------------------------------------------------------------ Internals
 
+    public void OpenSettings()
+    {
+        if (state != ScreenState.Paused) return;
+        RefreshSettingsSliders();
+        SetState(ScreenState.Settings);
+        FocusElement(sliderMouseSens != null ? (VisualElement)sliderMouseSens : btnSettingsBack);
+    }
+
+    public void CloseSettings()
+    {
+        if (state != ScreenState.Settings) return;
+        GameSettings.Save();
+        SetState(ScreenState.Paused);
+        FocusElement(btnResume);
+    }
+
+    private void SetupSettingsUI(VisualElement root)
+    {
+        GameSettings.EnsureLoaded();
+
+        sliderMouseSens = root.Q<Slider>("slider-mouse-sens");
+        sliderAimSens = root.Q<Slider>("slider-aim-sens");
+        sliderFov = root.Q<Slider>("slider-fov");
+        sliderVolume = root.Q<Slider>("slider-volume");
+        valMouseSens = root.Q<Label>("val-mouse-sens");
+        valAimSens = root.Q<Label>("val-aim-sens");
+        valFov = root.Q<Label>("val-fov");
+        valVolume = root.Q<Label>("val-volume");
+
+        if (sliderMouseSens != null)
+            sliderMouseSens.RegisterValueChangedCallback(e =>
+            {
+                GameSettings.SetMouseSensitivity(e.newValue);
+                if (valMouseSens != null) valMouseSens.text = $"{GameSettings.MouseSensitivity:0.00}x";
+            });
+
+        if (sliderAimSens != null)
+            sliderAimSens.RegisterValueChangedCallback(e =>
+            {
+                GameSettings.SetAimSensitivityMultiplier(e.newValue);
+                if (valAimSens != null) valAimSens.text = $"{GameSettings.AimSensitivityMultiplier:0.00}x";
+            });
+
+        if (sliderFov != null)
+            sliderFov.RegisterValueChangedCallback(e =>
+            {
+                GameSettings.SetFov(e.newValue);
+                if (valFov != null) valFov.text = $"{Mathf.RoundToInt(GameSettings.Fov)}";
+            });
+
+        if (sliderVolume != null)
+            sliderVolume.RegisterValueChangedCallback(e =>
+            {
+                GameSettings.SetMasterVolume(e.newValue);
+                if (valVolume != null) valVolume.text = $"{Mathf.RoundToInt(GameSettings.MasterVolume * 100f)}%";
+            });
+
+        btnSettingsBack = root.Q<Button>("btn-settings-back");
+        if (btnSettingsBack != null) btnSettingsBack.clicked += CloseSettings;
+
+        RefreshSettingsSliders();
+    }
+
+    private void RefreshSettingsSliders()
+    {
+        GameSettings.EnsureLoaded();
+        if (sliderMouseSens != null) sliderMouseSens.SetValueWithoutNotify(GameSettings.MouseSensitivity);
+        if (sliderAimSens != null) sliderAimSens.SetValueWithoutNotify(GameSettings.AimSensitivityMultiplier);
+        if (sliderFov != null) sliderFov.SetValueWithoutNotify(GameSettings.Fov);
+        if (sliderVolume != null) sliderVolume.SetValueWithoutNotify(GameSettings.MasterVolume);
+
+        if (valMouseSens != null) valMouseSens.text = $"{GameSettings.MouseSensitivity:0.00}x";
+        if (valAimSens != null) valAimSens.text = $"{GameSettings.AimSensitivityMultiplier:0.00}x";
+        if (valFov != null) valFov.text = $"{Mathf.RoundToInt(GameSettings.Fov)}";
+        if (valVolume != null) valVolume.text = $"{Mathf.RoundToInt(GameSettings.MasterVolume * 100f)}%";
+    }
+
     private void SetState(ScreenState newState)
     {
         state = newState;
 
-        SetScreenVisible(hudRoot, newState == ScreenState.Playing || newState == ScreenState.Paused, interactive: false);
+        SetScreenVisible(hudRoot, newState == ScreenState.Playing || newState == ScreenState.Paused || newState == ScreenState.Settings, interactive: false);
         SetScreenVisible(pauseRoot, newState == ScreenState.Paused, interactive: true);
+        SetScreenVisible(settingsRoot, newState == ScreenState.Settings, interactive: true);
         SetScreenVisible(deathRoot, newState == ScreenState.Dead, interactive: true);
         SetScreenVisible(escapeRoot, newState == ScreenState.Escaped, interactive: true);
     }

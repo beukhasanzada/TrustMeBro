@@ -23,7 +23,7 @@ MonoBehaviour:
   spreadDegrees: 0
   range: 80
   magazineCapacity: 12
-  startingReserve: 48
+  startingReserve: 500
   reloadSeconds: 1.1
   shootSfx: {fileID: 8300000, guid: 145c3910574afe24d8cf0c28bf63a2fd, type: 3}
   reloadSfx: {fileID: 8300000, guid: be12e332ef640ca4c821ef1bfe04f660, type: 3}

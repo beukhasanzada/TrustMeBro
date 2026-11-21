@@ -1204,55 +1204,55 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.24
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalPosition.z
       value: 3.65
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.5792279
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0.40557978
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0.40557978
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.5792279
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 775712634177583912, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4112897965090560635, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+    - target: {fileID: 4878875531172637671, guid: e4f5a6b7c8d940112233445566778805, type: 3}
       propertyPath: m_Name
-      value: PPSH Ground Pickup
+      value: AssaultRifle_Pickup
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: e4f5a6b7c8d940112233445566778805, type: 3}
 --- !u!1 &1359241932
 GameObject:
   m_ObjectHideFlags: 0

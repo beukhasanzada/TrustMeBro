@@ -1,0 +1,151 @@
+.l3-boss-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+}
+
+.retro-window {
+    background-image: url("project://database/Assets/RetroWindowsGUI/RetroWindowsGUI/Window_Base.png");
+    background-color: #C0C0C0;
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-color: #FFFFFF;
+    border-left-color: #FFFFFF;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    padding: 3px;
+}
+
+.retro-titlebar {
+    background-image: url("project://database/Assets/RetroWindowsGUI/RetroWindowsGUI/Window_Header.png");
+    background-color: #000080;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-height: 22px;
+}
+
+.retro-title-text {
+    color: #FFFFFF;
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 0.4px;
+}
+
+.retro-enrage-badge {
+    color: #FFEA55;
+    background-color: #991111;
+    font-size: 11px;
+    -unity-font-style: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    display: none;
+}
+
+.retro-body {
+    padding: 8px;
+}
+
+/* Top-center Boss Health Window */
+.boss-bar-window {
+    position: absolute;
+    top: 52px;
+    width: 480px;
+    display: none;
+}
+
+.boss-bar-body {
+    padding: 6px;
+}
+
+.retro-progress-track {
+    background-image: url("project://database/Assets/RetroWindowsGUI/RetroWindowsGUI/Windows_Inner_Frame_Inverted.png");
+    background-color: #8A8A8A;
+    height: 18px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-color: #404040;
+    border-left-color: #404040;
+    border-right-color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    padding: 2px;
+}
+
+.retro-progress-fill {
+    background-image: url("project://database/Assets/RetroWindowsGUI/RetroWindowsGUI/Windows_Progress_Fill.png");
+    background-color: #C82828;
+    height: 100%;
+    width: 100%;
+    transition-property: width;
+    transition-duration: 0.12s;
+}
+
+/* Auto-closing Retro Error/Phase Dialog (non-blocking) */
+.boss-dialog-window {
+    position: absolute;
+    top: 120px;
+    width: 360px;
+    display: none;
+}
+
+.dialog-body {
+    align-items: center;
+    padding: 10px;
+}
+
+.retro-dialog-text {
+    color: #111111;
+    font-size: 13px;
+    -unity-font-style: bold;
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.retro-ok-btn {
+    background-image: url("project://database/Assets/RetroWindowsGUI/RetroWindowsGUI/Windows_Button.png");
+    margin-top: 8px;
+    width: 78px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-color: #FFFFFF;
+    border-left-color: #FFFFFF;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+}
+
+.retro-ok-text {
+    color: #111111;
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+/* Bottom-right Reinforcement Toast */
+.reinforce-toast {
+    position: absolute;
+    right: 22px;
+    bottom: 24px;
+    width: 260px;
+    display: none;
+}
+
+.toast-body {
+    padding: 8px;
+}

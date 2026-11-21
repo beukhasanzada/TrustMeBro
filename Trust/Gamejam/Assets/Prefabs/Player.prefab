@@ -304,6 +304,7 @@ GameObject:
   - component: {fileID: 1407070505482944440}
   - component: {fileID: 4210530374399802914}
   - component: {fileID: 1651929327248517410}
+  - component: {fileID: 1139149692854645048}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -402,6 +403,7 @@ MonoBehaviour:
   walkSpeed: 9
   sprintSpeed: 15
   speedMultiplier: 1
+  instantStop: 1
   groundAcceleration: 80
   groundBraking: 28
   groundTurnSpeed: 540
@@ -433,6 +435,14 @@ MonoBehaviour:
   wallrunGravity: 5
   wallJumpUp: 8.5
   wallJumpAway: 8
+  blastJumpEnabled: 1
+  blastMaxDistance: 4
+  blastForce: 18
+  blastHorizontalMultiplier: 0.6
+  blastDecay: 12
+  blastSurfaces:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!82 &4210530374399802914
 AudioSource:
   m_ObjectHideFlags: 0
@@ -547,9 +557,24 @@ MonoBehaviour:
   viewModelMount: {fileID: 7710398372069335754}
   hitLayers:
     serializedVersion: 2
-    m_Bits: 123
+    m_Bits: 251
   loadout: []
   requireLockedCursorForMouse: 1
+  fireIntervalMultiplier: 1
+--- !u!114 &1139149692854645048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7763625136924699309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17630fc8959342ebbbf068db77472f6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 100
+  <CurrentHealth>k__BackingField: 0
 --- !u!1 &9151144014073301795
 GameObject:
   m_ObjectHideFlags: 0

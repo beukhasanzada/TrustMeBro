@@ -29,9 +29,12 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     [Header("Jump and air control")]
     [SerializeField, Min(0f)] float jumpSpeed = 9f;
     [SerializeField, Min(0f)] float gravity = 27f;
-    [SerializeField, Min(0f)] float airAcceleration = 32f;
+    [SerializeField, Min(0f)] float airAcceleration = 70f;
+    [SerializeField, Min(0f)] float airBraking = 90f;
     [SerializeField, Min(0f)] float airControlSpeed = 5f;
     [SerializeField, Min(0f)] float airSpeedLimit = 27f;
+    [SerializeField, Min(0)] int maxAirJumps = 1;
+    [SerializeField, Min(0f)] float airJumpHeight = 1.35f;
     [SerializeField, Min(0f)] float coyoteTime = 0.1f;
     [SerializeField, Min(0f)] float jumpBufferTime = 0.12f;
     [SerializeField] bool autoBunnyHop = true;
@@ -90,6 +93,8 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     InputAction move, look, jump, sprint, slide, dash;
     Vector2 moveInput;
     bool jumpHeld, sprintHeld, slideHeld, dashRequested;
+    bool airJumpPressed;
+    int airJumpsRemaining;
     bool slideUsedWhileHeld;
     double jumpBufferedUntil = double.NegativeInfinity;
     double lastGroundedAt = double.NegativeInfinity;
@@ -102,6 +107,9 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     double wallExclusionUntil;
     Vector3 blastVelocity;
     Vector3 appliedBlastVelocity;
+    Vector3 knockbackVelocity;
+    Vector3 appliedKnockbackVelocity;
+    float activeKnockbackDecay = 26f;
 
     public Vector2 LookInput { get; private set; }
     public bool LookUsesGamepad { get; private set; }
@@ -117,6 +125,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         : Mathf.Clamp01(1f - (float)(nextDashChargeAt - Time.timeAsDouble) / DashRechargeSeconds);
     public Vector3 Velocity => body.linearVelocity;
     public float StanceDrop => (standingHeight - capsule.height) * heightScale;
+    public event System.Action OnAirJump;
 
     void Awake()
     {
@@ -131,6 +140,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
 
         standingHeight = capsule.height;
         standingCenter = capsule.center;
+        airJumpsRemaining = maxAirJumps;
         Vector3 scale = transform.lossyScale;
         heightScale = Mathf.Abs(scale.y);
         radius = capsule.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
@@ -168,7 +178,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
 
         gameplay.Disable();
         moveInput = LookInput = Vector2.zero;
-        jumpHeld = sprintHeld = slideHeld = dashRequested = false;
+        jumpHeld = sprintHeld = slideHeld = dashRequested = airJumpPressed = false;
         jumpBufferedUntil = double.NegativeInfinity;
         SetCursorLocked(false);
     }
@@ -198,7 +208,10 @@ public sealed class RigidbodyFpsController : MonoBehaviour
             slideUsedWhileHeld = false;
 
         if (jump.WasPressedThisFrame())
+        {
             jumpBufferedUntil = Time.timeAsDouble + Mathf.Max(jumpBufferTime, Time.fixedDeltaTime);
+            airJumpPressed = true;
+        }
 
         dashRequested |= dash.WasPressedThisFrame();
     }
@@ -215,6 +228,12 @@ public sealed class RigidbodyFpsController : MonoBehaviour
             float carried = Mathf.Clamp(Vector3.Dot(Horizontal(velocity), blastDir), 0f, appliedBlastVelocity.magnitude);
             velocity -= blastDir * carried;
         }
+        if (appliedKnockbackVelocity.sqrMagnitude > 0f)
+        {
+            Vector3 kbDir = appliedKnockbackVelocity.normalized;
+            float carriedKb = Mathf.Clamp(Vector3.Dot(Horizontal(velocity), kbDir), 0f, appliedKnockbackVelocity.magnitude);
+            velocity -= kbDir * carriedKb;
+        }
         Vector3 groundNormal = Vector3.up;
         IsGrounded = now >= ignoreGroundUntil && FindGround(velocity, out groundNormal);
         if (IsGrounded)
@@ -223,6 +242,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
             lastGroundedAt = now;
             previousWall = null;
             wallExclusionUntil = 0d;
+            airJumpsRemaining = maxAirJumps;
         }
 
         Vector3 wish = orientation.right * moveInput.x + orientation.forward * moveInput.y;
@@ -238,10 +258,12 @@ public sealed class RigidbodyFpsController : MonoBehaviour
 
         if (canGroundJump && (bufferedJump || (autoBunnyHop && jumpHeld && IsGrounded)))
         {
+            airJumpPressed = false;
             velocity = GroundJump(velocity, wishDirection, now);
         }
         else if (IsDashing)
         {
+            airJumpPressed = false;
             IsSliding &= IsGrounded && slideHeld;
             UpdateStance(IsSliding);
             velocity = IsGrounded
@@ -250,9 +272,15 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         }
         else if (TryWallrun(velocity, now, out Vector3 wallNormal, out Vector3 wallTangent))
         {
-            velocity = bufferedJump
-                ? WallJump(velocity, wallNormal, wallTangent, now)
-                : RunAlongWall(velocity, wallNormal, wallTangent);
+            if (bufferedJump)
+            {
+                airJumpPressed = false;
+                velocity = WallJump(velocity, wallNormal, wallTangent, now);
+            }
+            else
+            {
+                velocity = RunAlongWall(velocity, wallNormal, wallTangent);
+            }
         }
         else if (IsGrounded)
         {
@@ -262,12 +290,55 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         {
             IsSliding = false;
             UpdateStance(false);
-            velocity = MoveInAir(velocity, wishDirection);
+            if (airJumpPressed && airJumpsRemaining > 0)
+            {
+                velocity = AirJump(velocity, wishDirection);
+            }
+            else
+            {
+                velocity = MoveInAir(velocity, wishDirection);
+            }
         }
+
+        airJumpPressed = false;
 
         blastVelocity = Vector3.MoveTowards(blastVelocity, Vector3.zero, blastDecay * Time.fixedDeltaTime);
         appliedBlastVelocity = blastVelocity;
-        body.linearVelocity = velocity + blastVelocity;
+        knockbackVelocity = Vector3.MoveTowards(knockbackVelocity, Vector3.zero, activeKnockbackDecay * Time.fixedDeltaTime);
+        appliedKnockbackVelocity = knockbackVelocity;
+        body.linearVelocity = velocity + blastVelocity + knockbackVelocity;
+    }
+
+    public void ApplyKnockback(Vector3 worldDirection, float strength)
+    {
+        ApplyKnockback(worldDirection, strength, 0.25f, 26f);
+    }
+
+    public void ApplyKnockback(Vector3 worldDirection, float strength, float upwardShare, float decayRate)
+    {
+        if (body == null || strength <= 0f)
+            return;
+
+        Vector3 horiz = new Vector3(worldDirection.x, 0f, worldDirection.z);
+        if (horiz.sqrMagnitude < 0.0001f)
+            horiz = -Horizontal(orientation.forward);
+        horiz.Normalize();
+
+        activeKnockbackDecay = Mathf.Max(1f, decayRate);
+        knockbackVelocity = horiz * strength;
+
+        float up = strength * Mathf.Clamp01(upwardShare);
+        if (up > 0f)
+        {
+            Vector3 v = body.linearVelocity;
+            v.y = Mathf.Max(v.y, up);
+            body.linearVelocity = v;
+            if (IsGrounded)
+            {
+                IsGrounded = false;
+                ignoreGroundUntil = Time.fixedTimeAsDouble + JumpGroundLock;
+            }
+        }
     }
 
     public void TryBlastJump(Ray ray)
@@ -376,17 +447,33 @@ public sealed class RigidbodyFpsController : MonoBehaviour
 
     Vector3 MoveInAir(Vector3 velocity, Vector3 wish)
     {
+        float dt = Time.fixedDeltaTime;
         Vector3 horizontal = Horizontal(velocity);
-        // Limit acceleration along the input direction while keeping existing momentum.
-        float remaining = airControlSpeed * moveInput.magnitude - Vector3.Dot(horizontal, wish);
-        if (remaining > 0f && wish != Vector3.zero)
+
+        if (wish == Vector3.zero)
         {
-            float impulse = Mathf.Min(remaining, airAcceleration * Time.fixedDeltaTime);
-            horizontal = Vector3.ClampMagnitude(horizontal + wish * impulse,
-                Mathf.Max(airSpeedLimit, horizontal.magnitude));
+            horizontal = Vector3.MoveTowards(horizontal, Vector3.zero, airBraking * dt);
+        }
+        else
+        {
+            float targetSpeed = (sprintHeld ? sprintSpeed : walkSpeed) * speedMultiplier;
+            Vector3 target = wish * (targetSpeed * moveInput.magnitude);
+            float rate = Vector3.Dot(horizontal, wish) < 0f ? airBraking : airAcceleration;
+            horizontal = Vector3.MoveTowards(horizontal, target, rate * dt);
         }
 
-        return horizontal + Vector3.up * (velocity.y - gravity * Time.fixedDeltaTime);
+        return horizontal + Vector3.up * (velocity.y - gravity * dt);
+    }
+
+    Vector3 AirJump(Vector3 velocity, Vector3 wish)
+    {
+        airJumpsRemaining--;
+        jumpBufferedUntil = double.NegativeInfinity;
+        float airJumpSpeed = Mathf.Sqrt(2f * gravity * airJumpHeight);
+        Vector3 moved = MoveInAir(velocity, wish);
+        moved.y = Mathf.Max(velocity.y, airJumpSpeed);
+        OnAirJump?.Invoke();
+        return moved;
     }
 
     Vector3 GroundJump(Vector3 velocity, Vector3 wish, double now)
@@ -488,7 +575,10 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         }
 
         if (runningWall == null)
+        {
             wallrunUntil = now + wallrunDuration;
+            airJumpsRemaining = maxAirJumps;
+        }
 
         runningWall = wall;
         WallSide = side;
@@ -510,7 +600,8 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     {
         StopWallrun(now);
         FinishJump(now);
-        return tangent * Vector3.Dot(velocity, tangent) + normal * wallJumpAway + Vector3.up * wallJumpUp;
+        blastVelocity += normal * wallJumpAway;
+        return tangent * Vector3.Dot(velocity, tangent) + Vector3.up * wallJumpUp;
     }
 
     void StopWallrun(double now)

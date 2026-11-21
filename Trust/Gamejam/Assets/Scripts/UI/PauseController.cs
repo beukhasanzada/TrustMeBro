@@ -47,11 +47,16 @@ public class PauseController : MonoBehaviour
 
     private void Update()
     {
-        if (uiManager == null || !uiManager.CanTogglePause) return;
+        if (uiManager == null) return;
 
         Keyboard kb = Keyboard.current;
         if (kb != null && kb.escapeKey.wasPressedThisFrame)
-            TogglePause();
+        {
+            if (uiManager.IsSettingsOpen)
+                uiManager.CloseSettings();
+            else if (uiManager.CanTogglePause)
+                TogglePause();
+        }
     }
 
     public void TogglePause()

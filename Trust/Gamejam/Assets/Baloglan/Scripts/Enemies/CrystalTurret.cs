@@ -20,6 +20,7 @@ public sealed class CrystalTurret : MonoBehaviour
     [SerializeField, Min(0.1f)] float attackRange = 30f;
     [SerializeField, Min(0f)] float attackCooldown = 0.9f;
     [SerializeField, Min(0f)] float damage = 12f;
+    [SerializeField, Min(0f)] float knockbackStrength = 8f;
     [SerializeField, Min(1f)] float turnSpeed = 420f;
     [SerializeField, Range(0f, 1f)] float shootAt = 0.25f;
     [SerializeField] EnemyLaserProjectile laserPrefab;
@@ -148,7 +149,7 @@ public sealed class CrystalTurret : MonoBehaviour
             direction = muzzle.forward;
 
         EnemyLaserProjectile laser = Instantiate(laserPrefab, muzzle.position, Quaternion.LookRotation(direction));
-        laser.Launch(transform, target, damage, sightLayers);
+        laser.LaunchTurret(transform, target, knockbackStrength, sightLayers);
         if (laserShotSfx != null)
             AudioSource.PlayClipAtPoint(laserShotSfx, muzzle.position);
 

@@ -21,6 +21,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
     [SerializeField, Min(0.1f)] float attackRange = 20f;
     [SerializeField, Min(0f)] float attackCooldown = 0.9f;
     [SerializeField, Min(0f)] float damage = 12f;
+    [SerializeField, Min(0f)] float timePenaltySeconds = 0.5f;
     [SerializeField] EnemyLaserProjectile laserPrefab;
     [SerializeField, Min(0f)] float turnSpeed = 420f;
 
@@ -281,7 +282,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
         shotFired = true;
         flashUntil = Time.time + FlashDuration;
         EnemyLaserProjectile laser = Instantiate(laserPrefab, muzzle.position, Quaternion.LookRotation(direction));
-        laser.Launch(transform, target, damage, sightLayers);
+        laser.LaunchRanged(transform, target, timePenaltySeconds, sightLayers);
         if (laserShotSfx != null)
             AudioSource.PlayClipAtPoint(laserShotSfx, muzzle.position);
     }

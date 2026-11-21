@@ -31,12 +31,17 @@ public class HUDController : MonoBehaviour
     private readonly Dictionary<string, VisualElement> buffChips = new Dictionary<string, VisualElement>();
 
     private VisualElement timeWrapper;
+    private VisualElement timeTrack;
     private VisualElement timeFill;
     private VisualElement timeTrail;
     private Label timeGainChevron;
     private VisualElement dangerVignette;
     private VisualElement slowVignette;
     private Label slowChip;
+    private VisualElement bossBarWrapper;
+    private VisualElement bossBarFill;
+    private Label bossBarLabel;
+    private FpsCameraRig cameraRig;
 
     private Label ammoCountLabel;
     private Label reloadHintLabel;
@@ -48,12 +53,17 @@ public class HUDController : MonoBehaviour
     private float trailNormalized = 1f;
     private float trailWaitTimer;
     private float shakeTimer;
+    private float hitVignetteTimer;
+    private float hitVignetteDuration;
+    private float hitVignettePeak;
+    private PlayerHitReceiver hitReceiver;
 
     private WeaponAmmoState currentAmmo;
     private bool wasReloading;
     private float reloadElapsed;
 
     private IVisualElementScheduledItem gainResetSchedule;
+    private IVisualElementScheduledItem lossFlashSchedule;
     private IVisualElementScheduledItem punchResetSchedule;
     private IVisualElementScheduledItem fireResetSchedule;
     private IVisualElementScheduledItem hitResetSchedule;
@@ -65,12 +75,16 @@ public class HUDController : MonoBehaviour
         if (manager != null) timeManager = manager;
 
         timeWrapper = root.Q<VisualElement>("time-wrapper");
+        timeTrack = root.Q<VisualElement>("time-track");
         timeFill = root.Q<VisualElement>("time-fill");
         timeTrail = root.Q<VisualElement>("time-trail");
         timeGainChevron = root.Q<Label>("time-gain-chevron");
         dangerVignette = root.Q<VisualElement>("danger-vignette");
         slowVignette = root.Q<VisualElement>("slow-vignette");
         slowChip = root.Q<Label>("slow-chip");
+        bossBarWrapper = root.Q<VisualElement>("boss-bar-wrapper");
+        bossBarFill = root.Q<VisualElement>("boss-bar-fill");
+        bossBarLabel = root.Q<Label>("boss-bar-label");
 
         ammoCountLabel = root.Q<Label>("ammo-count");
         reloadHintLabel = root.Q<Label>("reload-hint");
@@ -89,8 +103,12 @@ public class HUDController : MonoBehaviour
         {
             timeManager.OnTimeChanged -= HandleTimeChanged;
             timeManager.OnTimeChanged += HandleTimeChanged;
-            targetNormalized = displayNormalized = trailNormalized = timeManager.Normalized;
-            ApplyTimeBarWidths();
+            SyncTimeBarImmediate();
+        }
+
+        if (timeTrack != null)
+        {
+            timeTrack.RegisterCallback<GeometryChangedEvent>(_ => SyncTimeBarImmediate());
         }
 
         if (weaponController != null)
@@ -110,6 +128,33 @@ public class HUDController : MonoBehaviour
             playerSlow.OnSlowStateChanged += HandleSlowChanged;
             HandleSlowChanged(playerSlow.IsSlowed);
         }
+
+        hitReceiver = FindFirstObjectByType<PlayerHitReceiver>();
+        if (hitReceiver != null)
+        {
+            hitReceiver.OnRangedHitFeedback -= HandleRangedHitVignette;
+            hitReceiver.OnRangedHitFeedback += HandleRangedHitVignette;
+        }
+
+        cameraRig = FindFirstObjectByType<FpsCameraRig>();
+        if (cameraRig != null)
+        {
+            cameraRig.AimChanged -= SetCrosshairAiming;
+            cameraRig.AimChanged += SetCrosshairAiming;
+            SetCrosshairAiming(cameraRig.IsAiming);
+        }
+    }
+
+    private void Start()
+    {
+        SyncTimeBarImmediate();
+    }
+
+    private void SyncTimeBarImmediate()
+    {
+        if (timeManager == null) return;
+        targetNormalized = displayNormalized = trailNormalized = timeManager.Normalized;
+        ApplyTimeBarWidths();
     }
 
     private void OnDestroy()
@@ -122,6 +167,8 @@ public class HUDController : MonoBehaviour
             weaponController.TargetHit -= HandleTargetHit;
         }
         if (playerSlow != null) playerSlow.OnSlowStateChanged -= HandleSlowChanged;
+        if (hitReceiver != null) hitReceiver.OnRangedHitFeedback -= HandleRangedHitVignette;
+        if (cameraRig != null) cameraRig.AimChanged -= SetCrosshairAiming;
     }
 
     private void Update()
@@ -144,8 +191,9 @@ public class HUDController : MonoBehaviour
         }
         else if (delta <= -hazardShakeMinLoss)
         {
-            shakeTimer = 0.22f;
+            shakeTimer = 0.2f;
             trailWaitTimer = trailDelay;
+            TriggerTimeLossFlash();
         }
         else if (delta < 0f && targetNormalized < trailNormalized && trailWaitTimer <= 0f)
         {
@@ -189,8 +237,11 @@ public class HUDController : MonoBehaviour
             timeFill.style.opacity = pulse;
             if (dangerVignette != null)
             {
-                dangerVignette.EnableInClassList("vignette--active", isCritical);
-                dangerVignette.style.opacity = isCritical ? pulse * 0.85f : 0f;
+                float critAlpha = isCritical ? pulse * 0.85f : 0f;
+                float hitAlpha = SampleHitVignette(dt);
+                float alpha = Mathf.Max(critAlpha, hitAlpha);
+                dangerVignette.EnableInClassList("vignette--active", alpha > 0.01f);
+                dangerVignette.style.opacity = alpha;
             }
         }
         else
@@ -198,8 +249,9 @@ public class HUDController : MonoBehaviour
             timeFill.style.opacity = 1f;
             if (dangerVignette != null)
             {
-                dangerVignette.RemoveFromClassList("vignette--active");
-                dangerVignette.style.opacity = 0f;
+                float hitAlpha = SampleHitVignette(dt);
+                dangerVignette.EnableInClassList("vignette--active", hitAlpha > 0.01f);
+                dangerVignette.style.opacity = hitAlpha;
             }
         }
 
@@ -215,6 +267,31 @@ public class HUDController : MonoBehaviour
     {
         if (timeFill != null) timeFill.style.width = Length.Percent(displayNormalized * 100f);
         if (timeTrail != null) timeTrail.style.width = Length.Percent(trailNormalized * 100f);
+    }
+
+    private void TriggerTimeLossFlash()
+    {
+        if (timeFill == null) return;
+        timeFill.AddToClassList("time-fill--hit-flash");
+        lossFlashSchedule?.Pause();
+        lossFlashSchedule = timeFill.schedule.Execute(() =>
+        {
+            timeFill.RemoveFromClassList("time-fill--hit-flash");
+        }).StartingIn(200);
+    }
+
+    private void HandleRangedHitVignette(float strength, float duration)
+    {
+        hitVignettePeak = Mathf.Clamp01(strength);
+        hitVignetteDuration = Mathf.Max(0.02f, duration);
+        hitVignetteTimer = hitVignetteDuration;
+    }
+
+    private float SampleHitVignette(float dt)
+    {
+        if (hitVignetteTimer <= 0f) return 0f;
+        hitVignetteTimer = Mathf.Max(0f, hitVignetteTimer - dt);
+        return hitVignettePeak * (hitVignetteTimer / hitVignetteDuration);
     }
 
     private void TriggerTimeGainFeedback()
@@ -359,6 +436,26 @@ public class HUDController : MonoBehaviour
     {
         if (crosshair != null)
             crosshair.EnableInClassList("crosshair--enemy", isEnemy);
+    }
+
+    public void SetCrosshairAiming(bool isAiming)
+    {
+        if (crosshair != null)
+            crosshair.EnableInClassList("crosshair--aiming", isAiming);
+    }
+
+    public void SetBossBarVisible(bool visible, string title = "BOSS")
+    {
+        if (bossBarWrapper != null)
+            bossBarWrapper.EnableInClassList("hidden-display", !visible);
+        if (bossBarLabel != null && !string.IsNullOrEmpty(title))
+            bossBarLabel.text = title.ToUpperInvariant();
+    }
+
+    public void SetBossHealthNormalized(float normalized01)
+    {
+        if (bossBarFill != null)
+            bossBarFill.style.width = Length.Percent(Mathf.Clamp01(normalized01) * 100f);
     }
 
     // ------------------------------------------------------------------ Slow Cue & Buffs

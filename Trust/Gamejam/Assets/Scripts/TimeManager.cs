@@ -5,6 +5,7 @@ using UnityEngine;
 /// Time-as-health manager. Drains via Time.deltaTime (freezes when paused).
 /// Exposes only Normalized (0..1) and events so the HUD never shows exact seconds.
 /// </summary>
+[DefaultExecutionOrder(-50)]
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }

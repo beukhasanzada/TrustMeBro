@@ -12,6 +12,7 @@ public sealed class WeaponViewAnimator : MonoBehaviour
     static readonly int ReloadSpeed = Animator.StringToHash("ReloadSpeed");
 
     Animator animator;
+    MuzzleFlash muzzleFlash;
     int idleStateHash;
     int fireStateHash;
     int reloadStateHash;
@@ -19,13 +20,18 @@ public sealed class WeaponViewAnimator : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
+        muzzleFlash = GetComponentInParent<MuzzleFlash>() ?? GetComponentInChildren<MuzzleFlash>();
         idleStateHash = Animator.StringToHash(idleState);
         fireStateHash = Animator.StringToHash(fireState);
         reloadStateHash = Animator.StringToHash(reloadState);
     }
 
     public void PlayIdle() => Play(idleStateHash);
-    public void PlayFire() => Play(fireStateHash);
+    public void PlayFire()
+    {
+        Play(fireStateHash);
+        muzzleFlash?.Play();
+    }
 
     public void PlayReload(float duration)
     {

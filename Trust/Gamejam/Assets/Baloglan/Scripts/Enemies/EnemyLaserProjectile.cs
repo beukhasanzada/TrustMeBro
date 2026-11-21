@@ -7,19 +7,40 @@ public sealed class EnemyLaserProjectile : MonoBehaviour
     [SerializeField, Min(0.01f)] float radius = 0.055f;
     [SerializeField, Min(0.1f)] float lifetime = 2f;
 
+    enum HitKind { HealthDamage, TurretKnockback, RangedTimePenalty }
+
     readonly RaycastHit[] hits = new RaycastHit[12];
     readonly Collider[] spawnOverlaps = new Collider[12];
     Transform owner;
     Health target;
     LayerMask collisionLayers;
+    HitKind hitKind;
     float damage;
     float timeLeft;
 
     public void Launch(Transform source, Health hitTarget, float hitDamage, LayerMask layers)
     {
+        hitKind = HitKind.HealthDamage;
+        LaunchInternal(source, hitTarget, hitDamage, layers);
+    }
+
+    public void LaunchTurret(Transform source, Health hitTarget, float knockbackStrength, LayerMask layers)
+    {
+        hitKind = HitKind.TurretKnockback;
+        LaunchInternal(source, hitTarget, knockbackStrength, layers);
+    }
+
+    public void LaunchRanged(Transform source, Health hitTarget, float timePenaltySeconds, LayerMask layers)
+    {
+        hitKind = HitKind.RangedTimePenalty;
+        LaunchInternal(source, hitTarget, timePenaltySeconds, layers);
+    }
+
+    void LaunchInternal(Transform source, Health hitTarget, float hitValue, LayerMask layers)
+    {
         owner = source;
         target = hitTarget;
-        damage = hitDamage;
+        damage = hitValue;
         collisionLayers = layers;
         timeLeft = lifetime;
 
@@ -80,7 +101,15 @@ public sealed class EnemyLaserProjectile : MonoBehaviour
     {
         enabled = false;
         if (HitsTarget(collider))
-            target.TakeDamage(damage);
+        {
+            PlayerHitReceiver receiver = target.GetComponentInParent<PlayerHitReceiver>();
+            if (hitKind == HitKind.TurretKnockback && receiver != null)
+                receiver.HitByTurret(owner != null ? owner.position : transform.position, damage);
+            else if (hitKind == HitKind.RangedTimePenalty && receiver != null)
+                receiver.HitByRanged(damage);
+            else if (hitKind == HitKind.HealthDamage)
+                target.TakeDamage(damage);
+        }
         Destroy(gameObject);
     }
 }
