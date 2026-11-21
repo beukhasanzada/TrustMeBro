@@ -8,10 +8,9 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private Enemy enemyScript;
 
     [Header("Audio")]
-    public AudioClip[] shootClips;
-    public AudioClip[] reloadClips;
     public AudioClip[] fallClips;
     public AudioClip[] deathClips;
+    public AudioClip[] shootClips;
 
     [Header("General volume")]
     [Range(0f, 1f)] public float volume = 1f;
@@ -30,11 +29,9 @@ public class SoundManager : MonoBehaviour
     }
 
     // ===== Эти методы ты будешь вызывать из других скриптов =====
-
-    public void PlayShoot(Vector3 position) { Play(shootClips, position); }
-    public void PlayReload(Vector3 position) { Play(reloadClips, position); }
     public void PlayFall(Vector3 position) { Play(fallClips, position); }
     public void PlayDeath(Vector3 position) { Play(deathClips, position); }
+    public void PlayShoot(Vector3 position) { Play(shootClips, position); }
 
     // ===== Внутренняя логика =====
 
@@ -47,9 +44,10 @@ public class SoundManager : MonoBehaviour
         }
 
         if (clips == deathClips)
-        {   
-            if (GameTimer.Instance.isOver) clip = clips[1];
+        {
             if (enemyScript.isDead) clip = clips[0];
+            if (GameTimer.Instance.isOver) clip = clips[1];
+            
         }
 
         if (clips == fallClips)
@@ -57,7 +55,10 @@ public class SoundManager : MonoBehaviour
             clip = clips[0];
         }
 
-        if (clips == shootClips) clip = clips[0];
+        if (clips == shootClips)
+        {
+            clip = clips[0];
+        }
 
         // Проигрывает звук в точке мира и сам удаляет временный объект
         AudioSource.PlayClipAtPoint(clip, position, volume);

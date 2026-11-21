@@ -55,7 +55,6 @@ public class Weapon : MonoBehaviour
         ammo--;
 
         if (animator != null) animator.SetTrigger(shootTrigger);
-        SoundManager.Instance.PlayShoot(transform.position);
 
         Camera cam = Camera.main;
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
@@ -73,7 +72,6 @@ public class Weapon : MonoBehaviour
         isReloading = true;
 
         if (animator != null) animator.SetTrigger(reloadTrigger);
-        SoundManager.Instance.PlayReload(transform.position);
 
         yield return new WaitForSeconds(reloadTime);
 
