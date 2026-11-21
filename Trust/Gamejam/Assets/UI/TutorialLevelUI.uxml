@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/TutorialLevelUI.uss?fileID=7433441132597879392&amp;guid=ebaf57c85ee79af47a8015b719420f19&amp;type=3#TutorialLevelUI"/>
+    <ui:VisualElement name="tutorial-root" picking-mode="Ignore" class="tutorial-root">
+        <ui:VisualElement name="cutscene-overlay" picking-mode="Ignore" class="cutscene-overlay">
+            <ui:VisualElement picking-mode="Ignore" class="letterbox-bar letterbox-top"/>
+            <ui:VisualElement name="cutscene-banner" picking-mode="Ignore" class="cutscene-banner">
+                <ui:Label name="cutscene-banner-title" text="TUTORIAL COMPLETE" picking-mode="Ignore" class="cutscene-banner-title"/>
+                <ui:Label name="cutscene-banner-sub" text="ENTER THE PORTAL — NEXT SECTOR" picking-mode="Ignore" class="cutscene-banner-sub"/>
+            </ui:VisualElement>
+            <ui:VisualElement picking-mode="Ignore" class="letterbox-bar letterbox-bottom">
+                <ui:Label name="cutscene-skip-label" text="PRESS [SPACE] TO SKIP" picking-mode="Ignore" class="cutscene-skip-label"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="tutorial-fade-overlay" picking-mode="Ignore" class="tutorial-fade-overlay"/>
+    </ui:VisualElement>
+    <ui:Label name="step-row-0" text="•  1. WALK" picking-mode="Ignore" class="step-row step-row--active"/>
+    <ui:VisualElement name="tutorial-hud-container" picking-mode="Ignore" class="tutorial-hud-container" style="top: -4px; bottom: 8px; right: 1px; left: 4px;">
+        <ui:VisualElement name="tutorial-checklist" picking-mode="Ignore" class="tutorial-checklist" style="scale: 1.4 1.4; translate: 60px 84px; background-color: rgba(10, 14, 20, 0);">
+            <ui:Label text="MOVEMENT TRAINING" picking-mode="Ignore" class="checklist-header" style="-unity-font-style: bold; font-size: 25px; color: rgb(39, 0, 188); border-bottom-width: 3px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); width: 276px;"/>
+            <ui:Label name="step-row-1" text="•  2. JUMP" picking-mode="Ignore" class="step-row" style="font-size: 20px; color: rgba(255, 255, 255, 0.48); -unity-font-style: bold; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+            <ui:Label name="step-row-2" text="•  3. SPRINT + JUMP" picking-mode="Ignore" class="step-row" style="font-size: 20px; -unity-font-style: bold; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+            <ui:Label name="step-row-3" text="•  4. SPRINT + JUMP + DASH" picking-mode="Ignore" class="step-row" style="font-size: 20px; -unity-font-style: bold; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+            <ui:Label name="step-row-4" text="•  5. SLIDE" picking-mode="Ignore" class="step-row" style="font-size: 20px; -unity-font-style: bold; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+            <ui:Label name="step-row-5" text="•  6. WALL-RUN" picking-mode="Ignore" class="step-row" style="font-size: 20px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="tutorial-prompt-card" picking-mode="Ignore" class="tutorial-prompt-card" style="scale: 1.5 1.5; translate: 0 56px;">
+            <ui:Label name="prompt-step-title" text="STEP 1 / 6 — WALK" picking-mode="Ignore" class="prompt-step-title"/>
+            <ui:Label name="prompt-instruction-label" text="Use movement keys to walk forward." picking-mode="Ignore" class="prompt-instruction-label"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

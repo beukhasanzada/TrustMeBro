@@ -56,6 +56,7 @@ public sealed class WeaponController : MonoBehaviour
     [SerializeField] WeaponDefinition[] loadout = Array.Empty<WeaponDefinition>();
     [SerializeField] bool requireLockedCursorForMouse = true;
     [SerializeField] float fireIntervalMultiplier = 1f;
+    [SerializeField] bool autoReload = true;
 
     readonly RaycastHit[] hits = new RaycastHit[32];
     readonly WeaponItem[] slots = new WeaponItem[InventoryCapacity];
@@ -209,6 +210,13 @@ public sealed class WeaponController : MonoBehaviour
                 || (equipped.Definition.FireMode == WeaponFireMode.Automatic && fireHeld)))
         {
             TryFire();
+        }
+
+        if (autoReload && equipped != null && reloadCompleteAt < 0d
+            && equipped.Magazine == 0 && equipped.Reserve > 0
+            && Time.timeAsDouble >= equipped.NextShotAt)
+        {
+            TryReload();
         }
     }
 

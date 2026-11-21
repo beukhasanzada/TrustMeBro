@@ -1,0 +1,168 @@
+.tutorial-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: rgb(255, 255, 255);
+}
+
+.tutorial-hud-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.tutorial-checklist {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    width: 240px;
+    background-color: rgba(10, 14, 20, 0.68);
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-color: rgba(76, 224, 232, 0.35);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.checklist-header {
+    font-size: 11px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(76, 224, 232);
+    margin-bottom: 8px;
+}
+
+.step-row {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.48);
+    margin-bottom: 4px;
+    transition-property: color, translate;
+    transition-duration: 200ms;
+    border-bottom-width: 3px;
+}
+
+.step-row--active {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    translate: 4px 0;
+}
+
+.step-row--done {
+    color: rgb(92, 242, 164);
+    -unity-font-style: bold;
+}
+
+.tutorial-prompt-card {
+    position: absolute;
+    top: 26px;
+    align-self: center;
+    min-width: 440px;
+    max-width: 640px;
+    background-color: rgba(10, 14, 20, 0.78);
+    border-top-width: 2px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-top-color: rgb(76, 224, 232);
+    border-left-color: rgba(255, 255, 255, 0.16);
+    border-right-color: rgba(255, 255, 255, 0.16);
+    border-bottom-color: rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    padding: 14px 24px;
+    align-items: center;
+    opacity: 1;
+    scale: 1 1;
+    transition-property: opacity, scale;
+    transition-duration: 240ms;
+}
+
+.prompt-card--pop {
+    opacity: 0.25;
+    scale: 0.94 0.94;
+}
+
+.prompt-step-title {
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 2.5px;
+    color: rgb(76, 224, 232);
+    margin-bottom: 6px;
+}
+
+.prompt-instruction-label {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.cutscene-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    justify-content: space-between;
+}
+
+.letterbox-bar {
+    height: 68px;
+    background-color: rgba(5, 7, 10, 0.95);
+    justify-content: center;
+}
+
+.letterbox-bottom {
+    align-items: flex-end;
+    padding-right: 32px;
+}
+
+.cutscene-skip-label {
+    font-size: 14px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.cutscene-banner {
+    align-self: center;
+    background-color: rgba(10, 14, 20, 0.82);
+    border-width: 1px;
+    border-color: rgb(76, 224, 232);
+    border-radius: 10px;
+    padding: 18px 42px;
+    align-items: center;
+    display: none;
+}
+
+.cutscene-banner-title {
+    font-size: 32px;
+    -unity-font-style: bold;
+    letter-spacing: 4px;
+    color: rgb(255, 255, 255);
+}
+
+.cutscene-banner-sub {
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: rgb(76, 224, 232);
+    margin-top: 6px;
+}
+
+.tutorial-fade-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(5, 7, 10);
+    opacity: 0;
+    display: none;
+}
