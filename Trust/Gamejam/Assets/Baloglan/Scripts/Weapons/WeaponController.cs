@@ -55,6 +55,7 @@ public sealed class WeaponController : MonoBehaviour
     [SerializeField] LayerMask hitLayers = Physics.DefaultRaycastLayers;
     [SerializeField] WeaponDefinition[] loadout = Array.Empty<WeaponDefinition>();
     [SerializeField] bool requireLockedCursorForMouse = true;
+    [SerializeField] float fireIntervalMultiplier = 1f;
 
     readonly RaycastHit[] hits = new RaycastHit[32];
     readonly WeaponItem[] slots = new WeaponItem[InventoryCapacity];
@@ -62,6 +63,7 @@ public sealed class WeaponController : MonoBehaviour
     GameObject activeViewModel;
     WeaponViewAnimator viewAnimator;
     FpsCameraRig cameraRig;
+    RigidbodyFpsController fpsController;
     Vector3 mountRestPosition;
     Quaternion mountRestRotation;
     Vector2 recoilTarget;
@@ -77,13 +79,14 @@ public sealed class WeaponController : MonoBehaviour
     bool waitingForFireRelease;
     bool dropRequested;
     WeaponType requestedWeaponType;
-    int enemyHitboxLayer;
 
     public int EquippedIndex { get; private set; } = -1;
     public int WeaponCount { get; private set; }
     public WeaponAmmoState Ammo => equipped == null ? default
         : new WeaponAmmoState(equipped.Definition, equipped.Magazine, equipped.Reserve, reloadCompleteAt >= 0d);
     public event Action<WeaponAmmoState> AmmoChanged;
+    public event Action Fired;
+    public event Action TargetHit;
 
     void Awake()
     {
@@ -96,9 +99,9 @@ public sealed class WeaponController : MonoBehaviour
         }
 
         cameraRig = aim.GetComponentInParent<FpsCameraRig>();
+        fpsController = GetComponentInParent<RigidbodyFpsController>() ?? FindFirstObjectByType<RigidbodyFpsController>();
         mountRestPosition = viewModelMount.localPosition;
         mountRestRotation = viewModelMount.localRotation;
-        enemyHitboxLayer = LayerMask.NameToLayer("Enemy");
 
         for (int i = 0; i < Mathf.Min(loadout.Length, InventoryCapacity); i++)
         {
@@ -350,15 +353,14 @@ public sealed class WeaponController : MonoBehaviour
 
         WeaponDefinition definition = equipped.Definition;
         equipped.Magazine--;
-        equipped.NextShotAt = now + definition.ShotInterval;
+        
+        equipped.NextShotAt = now + definition.ShotInterval * fireIntervalMultiplier;
         PlaySfx(definition.ShootSfx);
         viewAnimator?.PlayFire();
 
         Quaternion rotation = aim.rotation;
         Vector3 origin = aim.position;
         float spread = Mathf.Tan(definition.SpreadDegrees * Mathf.Deg2Rad);
-        // The Animator can move enemy hitboxes between physics steps.
-        Physics.SyncTransforms();
         for (int i = 0; i < definition.PelletsPerShot; i++)
         {
             Vector2 offset = spread > 0f ? UnityEngine.Random.insideUnitCircle * spread : Vector2.zero;
@@ -366,12 +368,16 @@ public sealed class WeaponController : MonoBehaviour
             ApplyHit(origin, direction, definition);
         }
 
+        if (definition.Type == WeaponType.Shotgun && fpsController != null)
+            fpsController.TryBlastJump(new Ray(origin, aim.forward));
+
         // This kick affects the rendered aim from the next frame onward.
         float maxStack = definition.Recoil.maxStack;
         recoilTarget.x = Mathf.Min(recoilTarget.x + 1f, maxStack);
         recoilTarget.y = Mathf.Clamp(recoilTarget.y + UnityEngine.Random.Range(-1f, 1f), -maxStack, maxStack);
 
         PublishAmmo();
+        Fired?.Invoke();
         return true;
     }
 
@@ -436,32 +442,29 @@ public sealed class WeaponController : MonoBehaviour
 
     void ApplyHit(Vector3 origin, Vector3 direction, WeaponDefinition definition)
     {
-        RaycastHit nearest = default;
+        Collider nearest = null;
         float nearestDistance = definition.Range;
         int count = Physics.RaycastNonAlloc(origin, direction, hits, nearestDistance, hitLayers,
-            QueryTriggerInteraction.Collide);
+            QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
             RaycastHit hit = hits[i];
-            Collider collider = hit.collider;
-            if (hit.distance > nearestDistance || collider.transform.IsChildOf(transform)
-                || (collider.isTrigger && collider.gameObject.layer != enemyHitboxLayer))
+            if (hit.distance > nearestDistance || hit.collider.transform.IsChildOf(transform))
                 continue;
 
-            nearest = hit;
+            nearest = hit.collider;
             nearestDistance = hit.distance;
         }
 
-        Collider target = nearest.collider;
-        if (target == null)
-            return;
-
-        IWeaponDamageable damageable = target.GetComponentInParent<IWeaponDamageable>();
-        if (damageable == null)
-            return;
-
-        target.GetComponentInParent<EnemyHitImpact>()?.PlayAt(nearest.point, nearest.normal);
-        damageable.TakeWeaponDamage(definition.DamagePerPellet);
+        if (nearest != null)
+        {
+            IWeaponDamageable damageable = nearest.GetComponentInParent<IWeaponDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeWeaponDamage(definition.DamagePerPellet);
+                TargetHit?.Invoke();
+            }
+        }
     }
 
     void PlaySfx(AudioClip clip)

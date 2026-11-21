@@ -1,0 +1,640 @@
+/* ==========================================================================
+   MODERN MINIMALIST IN-GAME UI — TIME-AS-HEALTH PARKOUR SHOOTER
+   All palette, typography, radii, spacing, and animation durations live here.
+   ========================================================================== */
+
+:root {
+    /* Palette */
+    --color-accent: #4ce0e8;
+    --color-accent-soft: rgba(76, 224, 232, 0.28);
+    --color-danger: #ff543e;
+    --color-danger-edge: rgba(255, 84, 62, 0.34);
+    --color-slow: #6cc8ff;
+    --color-slow-edge: rgba(108, 200, 255, 0.24);
+
+    --color-white: #ffffff;
+    --color-white-75: rgba(255, 255, 255, 0.75);
+    --color-white-40: rgba(255, 255, 255, 0.4);
+    --color-white-16: rgba(255, 255, 255, 0.16);
+    --color-white-08: rgba(255, 255, 255, 0.08);
+
+    --color-panel: rgba(10, 14, 20, 0.48);
+    --color-panel-strong: rgba(10, 14, 20, 0.68);
+    --color-overlay-pause: rgba(6, 9, 14, 0.66);
+    --color-overlay-death: rgba(6, 8, 12, 0.88);
+    --color-black: #05070a;
+
+    /* Font slot — swap to a custom FontAsset anytime:
+       --font-main: url("project://database/Assets/Fonts/Inter.asset"); */
+    --font-main: initial;
+
+    /* Typography */
+    --font-size-title: 44px;
+    --font-size-ammo: 42px;
+    --font-size-heading: 26px;
+    --font-size-button: 16px;
+    --font-size-chip: 13px;
+    --font-size-micro: 11px;
+    --tracking-label: 3px;
+    --tracking-wide: 6px;
+
+    /* Radii & Borders */
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-pill: 99px;
+    --border-thin: 1px;
+
+    /* Spacing */
+    --space-xs: 6px;
+    --space-sm: 10px;
+    --space-md: 18px;
+    --space-lg: 28px;
+    --space-xl: 42px;
+
+    /* Durations */
+    --dur-fast: 150ms;
+    --dur-mid: 240ms;
+    --dur-slow: 380ms;
+
+    /* Element sizes */
+    --time-bar-width: 520px;
+    --time-bar-height: 8px;
+    --pip-width: 8px;
+    --pip-height: 22px;
+    --button-width: 240px;
+    --button-height: 44px;
+}
+
+/* ==========================================================================
+   ROOT & SCREEN TRANSITIONS
+   ========================================================================== */
+
+.ui-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--color-white);
+    -unity-font-definition: var(--font-main);
+}
+
+.screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-mid), var(--dur-mid);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.screen--hidden {
+    opacity: 0;
+    translate: 0 12px;
+    visibility: hidden;
+}
+
+.screen--death {
+    transition-duration: var(--dur-slow), var(--dur-slow);
+}
+
+/* Full-screen non-blocking edge vignettes (critical time & slow) */
+.vignette {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    border-width: 24px;
+    border-radius: 0;
+    transition-property: opacity;
+    transition-duration: var(--dur-mid);
+    transition-timing-function: ease-out;
+}
+
+.vignette--danger {
+    border-color: var(--color-danger-edge);
+}
+
+.vignette--slow {
+    border-color: var(--color-slow-edge);
+}
+
+.vignette--active {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   1. HUD — TIME BAR (TOP CENTER)
+   ========================================================================== */
+
+.hud-root {
+    padding: var(--space-lg);
+}
+
+.time-wrapper {
+    position: absolute;
+    top: var(--space-lg);
+    align-self: center;
+    align-items: center;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    background-color: var(--color-panel);
+    border-width: var(--border-thin);
+    border-color: var(--color-white-16);
+    border-radius: var(--radius-md);
+    scale: 1 1;
+    translate: 0 0;
+    transition-property: scale, border-color, translate;
+    transition-duration: var(--dur-fast), var(--dur-mid), 80ms;
+    transition-timing-function: ease-out, ease-out, ease-out;
+}
+
+.time-wrapper--gain {
+    scale: 1.035 1.035;
+    border-color: var(--color-accent);
+}
+
+.time-wrapper--danger {
+    border-color: var(--color-danger);
+}
+
+.time-header {
+    width: var(--time-bar-width);
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+}
+
+.micro-label {
+    font-size: var(--font-size-micro);
+    color: var(--color-white-75);
+    letter-spacing: var(--tracking-label);
+    margin: 0;
+    padding: 0;
+}
+
+.time-gain-chevron {
+    font-size: var(--font-size-chip);
+    color: var(--color-accent);
+    -unity-font-style: bold;
+    opacity: 0;
+    translate: 0 4px;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-mid), var(--dur-mid);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.time-gain-chevron--show {
+    opacity: 1;
+    translate: 0 -4px;
+}
+
+.time-track {
+    width: var(--time-bar-width);
+    height: var(--time-bar-height);
+    background-color: var(--color-white-08);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    position: relative;
+}
+
+.time-trail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--color-white-40);
+    border-radius: var(--radius-pill);
+}
+
+.time-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--color-accent);
+    border-radius: var(--radius-pill);
+    transition-property: background-color;
+    transition-duration: var(--dur-mid);
+    transition-timing-function: ease-out;
+}
+
+.time-fill--gain {
+    background-color: var(--color-white);
+}
+
+.time-fill--danger {
+    background-color: var(--color-danger);
+}
+
+.time-cap-notch {
+    position: absolute;
+    right: 0;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background-color: var(--color-white-75);
+}
+
+/* Subtle SLOWED chip below time bar */
+.slow-chip {
+    margin-top: var(--space-xs);
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: var(--radius-sm);
+    border-width: var(--border-thin);
+    border-color: var(--color-slow);
+    background-color: var(--color-panel);
+    color: var(--color-slow);
+    font-size: var(--font-size-micro);
+    letter-spacing: var(--tracking-label);
+    opacity: 0;
+    translate: 0 -6px;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-fast), var(--dur-fast);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.slow-chip--active {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* ==========================================================================
+   2. HUD — AMMO (BOTTOM RIGHT)
+   ========================================================================== */
+
+.ammo-panel {
+    position: absolute;
+    right: var(--space-lg);
+    bottom: var(--space-lg);
+    flex-direction: column;
+    align-items: flex-end;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    background-color: var(--color-panel);
+    border-width: var(--border-thin);
+    border-color: var(--color-white-16);
+    border-radius: var(--radius-md);
+}
+
+.ammo-top-row {
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.ammo-pips {
+    flex-direction: row;
+    align-items: center;
+    margin-right: var(--space-md);
+    margin-bottom: 6px;
+}
+
+.ammo-pip {
+    width: var(--pip-width);
+    height: var(--pip-height);
+    margin-left: 5px;
+    background-color: var(--color-white);
+    border-radius: 3px;
+    opacity: 1;
+    translate: 0 0;
+    scale: 1 1;
+    transition-property: opacity, translate, scale, background-color;
+    transition-duration: var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast);
+    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+.ammo-pip--spent {
+    opacity: 0.16;
+    translate: 0 6px;
+    scale: 0.85 0.85;
+}
+
+.ammo-pip--reloading {
+    background-color: var(--color-accent);
+    scale: 1.12 1.12;
+}
+
+.ammo-count {
+    font-size: var(--font-size-ammo);
+    color: var(--color-white);
+    min-width: 34px;
+    -unity-text-align: middle-right;
+    margin: 0;
+    padding: 0;
+    scale: 1 1;
+    transition-property: scale, color;
+    transition-duration: var(--dur-fast), var(--dur-fast);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.ammo-count--punch {
+    scale: 1.24 1.24;
+    color: var(--color-accent);
+}
+
+.ammo-count--empty {
+    color: var(--color-danger);
+}
+
+.reload-hint {
+    margin-top: 2px;
+    font-size: var(--font-size-micro);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-danger);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--dur-fast);
+}
+
+/* ==========================================================================
+   3. HUD — CROSSHAIR & HIT MARKER (CENTER)
+   ========================================================================== */
+
+.crosshair {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    align-items: center;
+    justify-content: center;
+    scale: 1 1;
+    transition-property: scale;
+    transition-duration: var(--dur-fast);
+    transition-timing-function: ease-out;
+}
+
+.crosshair--fired {
+    scale: 1.45 1.45;
+}
+
+.crosshair-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-white);
+    transition-property: background-color;
+    transition-duration: var(--dur-fast);
+}
+
+.crosshair-arm {
+    position: absolute;
+    background-color: var(--color-white-75);
+    border-radius: 1px;
+    transition-property: background-color, translate;
+    transition-duration: var(--dur-fast), var(--dur-fast);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.crosshair-arm--top    { width: 2px; height: 6px; translate: 0 -9px; }
+.crosshair-arm--bottom { width: 2px; height: 6px; translate: 0 9px; }
+.crosshair-arm--left   { width: 6px; height: 2px; translate: -9px 0; }
+.crosshair-arm--right  { width: 6px; height: 2px; translate: 9px 0; }
+
+.crosshair--enemy .crosshair-dot,
+.crosshair--enemy .crosshair-arm {
+    background-color: var(--color-danger);
+}
+
+/* Brief 4-tick hit marker */
+.hit-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    scale: 0.8 0.8;
+    transition-property: opacity, scale;
+    transition-duration: 120ms, 120ms;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.hit-marker--show {
+    opacity: 1;
+    scale: 1.1 1.1;
+}
+
+.hit-tick {
+    position: absolute;
+    width: 9px;
+    height: 2px;
+    background-color: var(--color-white);
+    border-radius: 1px;
+}
+
+.hit-tick--tl { translate: -9px -9px; rotate: 45deg; }
+.hit-tick--tr { translate: 9px -9px;  rotate: -45deg; }
+.hit-tick--bl { translate: -9px 9px;  rotate: -45deg; }
+.hit-tick--br { translate: 9px 9px;   rotate: 45deg; }
+
+/* ==========================================================================
+   4. HUD — BUFF LIST (TOP RIGHT)
+   ========================================================================== */
+
+.buff-list {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.buff-chip {
+    flex-direction: row;
+    align-items: center;
+    padding-left: var(--space-sm);
+    padding-right: var(--space-md);
+    padding-top: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    background-color: var(--color-panel);
+    border-width: var(--border-thin);
+    border-color: var(--color-white-16);
+    border-radius: var(--radius-md);
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-mid), var(--dur-mid);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.buff-chip--enter {
+    opacity: 0;
+    translate: 28px 0;
+}
+
+.buff-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--space-sm);
+    border-radius: 5px;
+    background-color: var(--color-accent-soft);
+    border-width: var(--border-thin);
+    border-color: var(--color-accent);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.buff-name {
+    font-size: var(--font-size-chip);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-white);
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================================================================
+   5. OVERLAY SCREENS (PAUSE, TIME'S UP, ESCAPED)
+   ========================================================================== */
+
+.overlay-pause {
+    background-color: var(--color-overlay-pause);
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-death {
+    background-color: var(--color-overlay-death);
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-escape {
+    background-color: var(--color-black);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-card {
+    background-color: var(--color-panel-strong);
+    border-width: var(--border-thin);
+    border-color: var(--color-white-16);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    min-width: 340px;
+    align-items: center;
+}
+
+.modal-card--danger {
+    border-color: var(--color-danger);
+}
+
+.screen-title {
+    font-size: var(--font-size-title);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-white);
+    margin-bottom: var(--space-lg);
+    -unity-text-align: middle-center;
+}
+
+.screen-title--danger {
+    color: var(--color-danger);
+}
+
+.button-stack {
+    flex-direction: column;
+    align-items: center;
+}
+
+.ui-button {
+    width: var(--button-width);
+    height: var(--button-height);
+    margin-bottom: var(--space-sm);
+    background-color: var(--color-white-08);
+    color: var(--color-white);
+    font-size: var(--font-size-button);
+    letter-spacing: var(--tracking-label);
+    border-width: var(--border-thin);
+    border-color: var(--color-white-16);
+    border-radius: var(--radius-sm);
+    scale: 1 1;
+    transition-property: scale, border-color, background-color, color;
+    transition-duration: var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast);
+    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+.ui-button:hover {
+    scale: 1.03 1.03;
+    border-color: var(--color-white-75);
+    background-color: var(--color-white-16);
+}
+
+.ui-button:focus {
+    scale: 1.04 1.04;
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-soft);
+    color: var(--color-white);
+}
+
+.ui-button:active {
+    scale: 0.98 0.98;
+    background-color: var(--color-accent);
+    color: var(--color-black);
+}
+
+/* Escape screen line fade-in */
+.escape-stack {
+    align-items: center;
+    justify-content: center;
+}
+
+.escape-line {
+    font-size: var(--font-size-title);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-white);
+    margin-bottom: var(--space-md);
+    opacity: 0;
+    translate: 0 10px;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-slow), var(--dur-slow);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.escape-line--sub {
+    font-size: var(--font-size-heading);
+    color: var(--color-white-75);
+    margin-bottom: var(--space-xl);
+}
+
+.escape-line--visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.escape-actions {
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    translate: 0 10px;
+    transition-property: opacity, translate;
+    transition-duration: var(--dur-slow), var(--dur-slow);
+    transition-timing-function: ease-out, ease-out;
+}
+
+.escape-actions--visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.hidden-display {
+    display: none;
+}
