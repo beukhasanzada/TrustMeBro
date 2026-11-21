@@ -50,6 +50,19 @@ public sealed class FpsCameraRig : MonoBehaviour
     float roll;
 
     public Vector2 WeaponRecoilAngles { get; set; }
+    public Vector2 HitKickAngles { get; set; }
+
+    public void ResetAfterRespawn()
+    {
+        if (orientation == null || fpsCamera == null)
+            return;
+
+        yaw = orientation.localEulerAngles.y;
+        pitch = bobPhase = bobWeight = stanceOffset = roll = 0f;
+        lookDegrees = sway = HitKickAngles = WeaponRecoilAngles = Vector2.zero;
+        transform.SetLocalPositionAndRotation(restPosition, orientation.localRotation);
+        fpsCamera.PreviousStateIsValid = false;
+    }
 
     void Awake()
     {
@@ -62,6 +75,7 @@ public sealed class FpsCameraRig : MonoBehaviour
 
         restPosition = transform.localPosition;
         yaw = orientation.localEulerAngles.y;
+        aimAction.AddBinding("<Gamepad>/leftTrigger");
         GameSettings.EnsureLoaded();
     }
 
@@ -80,9 +94,12 @@ public sealed class FpsCameraRig : MonoBehaviour
         }
     }
 
+    void OnDestroy() => aimAction.Dispose();
+
     void Update()
     {
-        bool nowAiming = Cursor.lockState == CursorLockMode.Locked && aimAction.IsPressed();
+        bool nowAiming = aimAction.IsPressed()
+            && (aimAction.activeControl?.device is Gamepad || Cursor.lockState == CursorLockMode.Locked);
         if (nowAiming != IsAiming)
         {
             IsAiming = nowAiming;
@@ -132,9 +149,10 @@ public sealed class FpsCameraRig : MonoBehaviour
         roll = Mathf.Lerp(roll, rollTarget, blend);
 
         transform.localPosition = restPosition + orientation.localRotation * bob - Vector3.up * stanceOffset;
-        float recoilPitch = Mathf.Clamp(pitch - WeaponRecoilAngles.x, -maxPitch, maxPitch);
+        Vector2 aimOffset = WeaponRecoilAngles + HitKickAngles;
+        float recoilPitch = Mathf.Clamp(pitch - aimOffset.x, -maxPitch, maxPitch);
         transform.localRotation = orientation.localRotation
-            * Quaternion.Euler(recoilPitch + sway.y, WeaponRecoilAngles.y - sway.x, roll);
+            * Quaternion.Euler(recoilPitch + sway.y, aimOffset.y - sway.x, roll);
 
         float fovBoost = motor.IsDashing ? dashFovBoost : motor.IsSprinting ? sprintFovBoost : 0f;
         float targetFov = Mathf.Max(30f, GameSettings.Fov + fovBoost - (IsAiming ? aimFovReduction : 0f));

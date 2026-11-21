@@ -1,34 +1,33 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/RetroChrome.uss" />
     <Style src="project://database/Assets/UI/Level3BossUI.uss" />
     <ui:VisualElement name="l3-boss-root" class="l3-boss-root" picking-mode="Ignore">
         <!-- Top-center Boss Health Window -->
-        <ui:VisualElement name="boss-bar-window" class="retro-window boss-bar-window" picking-mode="Ignore">
+        <ui:VisualElement name="boss-bar-window" class="retro-frame boss-bar-window" picking-mode="Ignore">
             <ui:VisualElement class="retro-titlebar" picking-mode="Ignore">
+                <ui:VisualElement class="retro-app-icon" picking-mode="Ignore" />
                 <ui:Label name="boss-title-label" text="OVERSEER.EXE - SYSTEM MONITOR" class="retro-title-text" picking-mode="Ignore" />
                 <ui:Label name="boss-enrage-badge" text="[SHIELD: MINION CAP]" class="retro-enrage-badge" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:VisualElement class="retro-body boss-bar-body" picking-mode="Ignore">
-                <ui:VisualElement class="retro-progress-track" picking-mode="Ignore">
-                    <ui:VisualElement name="boss-health-fill" class="retro-progress-fill" picking-mode="Ignore" />
+                <ui:VisualElement class="retro-meter retro-progress-track" picking-mode="Ignore">
+                    <ui:VisualElement name="boss-health-fill" class="retro-meter-gloss retro-progress-fill" picking-mode="Ignore" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
         <!-- Non-blocking Intro / Phase Dialog Window -->
-        <ui:VisualElement name="boss-dialog-window" class="retro-window boss-dialog-window" picking-mode="Ignore">
+        <ui:VisualElement name="boss-dialog-window" class="retro-frame boss-dialog-window" picking-mode="Ignore">
             <ui:VisualElement class="retro-titlebar" picking-mode="Ignore">
                 <ui:Label name="dialog-title-label" text="SYSTEM ERROR" class="retro-title-text" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:VisualElement class="retro-body dialog-body" picking-mode="Ignore">
                 <ui:Label name="dialog-message-label" text="OVERSEER.EXE has appeared." class="retro-dialog-text" picking-mode="Ignore" />
-                <ui:VisualElement class="retro-ok-btn" picking-mode="Ignore">
-                    <ui:Label text="OK" class="retro-ok-text" picking-mode="Ignore" />
-                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
         <!-- Bottom-right Corner Reinforcement Alert (max once per phase) -->
-        <ui:VisualElement name="reinforce-toast" class="retro-window reinforce-toast" picking-mode="Ignore">
+        <ui:VisualElement name="reinforce-toast" class="retro-frame reinforce-toast" picking-mode="Ignore">
             <ui:VisualElement class="retro-titlebar" picking-mode="Ignore">
                 <ui:Label text="NET_ALERT.EXE" class="retro-title-text" picking-mode="Ignore" />
             </ui:VisualElement>

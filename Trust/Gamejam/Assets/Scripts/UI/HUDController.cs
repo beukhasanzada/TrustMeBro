@@ -44,6 +44,10 @@ public class HUDController : MonoBehaviour
     private FpsCameraRig cameraRig;
 
     private Label ammoCountLabel;
+    private VisualElement ammoPanel;
+    private Label ammoWeaponName;
+    private Label ammoMagazineSize;
+    private Label ammoReserve;
     private Label reloadHintLabel;
     private VisualElement crosshair;
     private VisualElement hitMarker;
@@ -87,6 +91,10 @@ public class HUDController : MonoBehaviour
         bossBarLabel = root.Q<Label>("boss-bar-label");
 
         ammoCountLabel = root.Q<Label>("ammo-count");
+        ammoPanel = root.Q<VisualElement>("ammo-panel");
+        ammoWeaponName = root.Q<Label>("ammo-weapon-name");
+        ammoMagazineSize = root.Q<Label>("ammo-magazine-size");
+        ammoReserve = root.Q<Label>("ammo-reserve");
         reloadHintLabel = root.Q<Label>("reload-hint");
         crosshair = root.Q<VisualElement>("crosshair");
         hitMarker = root.Q<VisualElement>("hit-marker");
@@ -405,6 +413,11 @@ public class HUDController : MonoBehaviour
     private void UpdateAmmoVisuals(WeaponAmmoState state)
     {
         bool hasWeapon = state.Weapon != null;
+        ammoPanel?.EnableInClassList("ammo-panel--empty", !hasWeapon);
+        if (ammoWeaponName != null) ammoWeaponName.text = hasWeapon ? state.Weapon.DisplayName : "No weapon";
+        if (ammoMagazineSize != null) ammoMagazineSize.text = hasWeapon ? $"/ {state.MagazineCapacity}" : "";
+        if (ammoReserve != null) ammoReserve.text = hasWeapon ? $"Reserve  {state.Reserve}" : "";
+
         if (ammoCountLabel != null)
         {
             ammoCountLabel.text = hasWeapon ? state.InMagazine.ToString() : "--";

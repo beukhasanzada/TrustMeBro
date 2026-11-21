@@ -1,0 +1,39 @@
+.lesson-panel {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    width: 345px;
+    max-width: 39%;
+}
+
+.lesson-panel .retro-title {
+    white-space: normal;
+}
+
+.lesson-hint {
+    margin: 8px 9px 6px 9px;
+    color: #263450;
+    font-size: 13px;
+    white-space: normal;
+}
+
+.lesson-task {
+    background-color: #e3e8ee;
+    color: #253c60;
+    font-size: 13px;
+    margin: 1px 9px;
+    padding: 3px 6px;
+    white-space: normal;
+}
+
+.lesson-task--done {
+    background-color: #dceecf;
+    color: #234822;
+}
+
+.lesson-reset {
+    margin: 7px 9px 5px 9px;
+    color: #3a4961;
+    font-size: 11px;
+    white-space: normal;
+}

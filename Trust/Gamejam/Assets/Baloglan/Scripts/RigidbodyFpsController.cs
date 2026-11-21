@@ -126,6 +126,34 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     public Vector3 Velocity => body.linearVelocity;
     public float StanceDrop => (standingHeight - capsule.height) * heightScale;
     public event System.Action OnAirJump;
+    public event System.Action<bool> OnGroundJump;
+    public event System.Action OnWallJump;
+    public event System.Action OnBlastJump;
+
+    public void RespawnAt(Vector3 position, Quaternion rotation)
+    {
+        Quaternion heading = Quaternion.Euler(0f, rotation.eulerAngles.y, 0f);
+        body.position = position;
+        body.rotation = heading;
+        body.linearVelocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+
+        moveInput = LookInput = Vector2.zero;
+        jumpHeld = sprintHeld = slideHeld = dashRequested = airJumpPressed = slideUsedWhileHeld = false;
+        IsGrounded = IsSliding = IsDashing = false;
+        jumpBufferedUntil = lastGroundedAt = double.NegativeInfinity;
+        ignoreGroundUntil = dashUntil = wallrunUntil = wallExclusionUntil = 0d;
+        runningWall = previousWall = null;
+        WallSide = 0;
+        airJumpsRemaining = maxAirJumps;
+        blastVelocity = appliedBlastVelocity = knockbackVelocity = appliedKnockbackVelocity = Vector3.zero;
+
+        orientation.localRotation = Quaternion.identity;
+        UpdateStance(false);
+        GetComponentInChildren<WeaponController>(true)?.ResetRecoil();
+        GetComponent<PlayerHitReceiver>()?.ClearCameraKick();
+        GetComponentInChildren<FpsCameraRig>(true)?.ResetAfterRespawn();
+    }
 
     void Awake()
     {
@@ -259,7 +287,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         if (canGroundJump && (bufferedJump || (autoBunnyHop && jumpHeld && IsGrounded)))
         {
             airJumpPressed = false;
-            velocity = GroundJump(velocity, wishDirection, now);
+            velocity = GroundJump(velocity, wishDirection, now, !bufferedJump);
         }
         else if (IsDashing)
         {
@@ -380,6 +408,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
             ignoreGroundUntil = Time.fixedTimeAsDouble + JumpGroundLock;
             lastGroundedAt = jumpBufferedUntil = double.NegativeInfinity;
             UpdateStance(false);
+            OnBlastJump?.Invoke();
         }
 
         blastVelocity += new Vector3(push.x, 0f, push.z) * (force * blastHorizontalMultiplier);
@@ -476,7 +505,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         return moved;
     }
 
-    Vector3 GroundJump(Vector3 velocity, Vector3 wish, double now)
+    Vector3 GroundJump(Vector3 velocity, Vector3 wish, double now, bool automatic)
     {
         Vector3 horizontal = Horizontal(velocity);
         float speed = horizontal.magnitude;
@@ -487,6 +516,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         }
 
         FinishJump(now);
+        OnGroundJump?.Invoke(automatic);
         return horizontal + Vector3.up * Mathf.Max(jumpSpeed, velocity.y);
     }
     
@@ -601,6 +631,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         StopWallrun(now);
         FinishJump(now);
         blastVelocity += normal * wallJumpAway;
+        OnWallJump?.Invoke();
         return tangent * Vector3.Dot(velocity, tangent) + Vector3.up * wallJumpUp;
     }
 

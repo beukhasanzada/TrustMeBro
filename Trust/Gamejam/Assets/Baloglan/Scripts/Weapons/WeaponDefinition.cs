@@ -11,7 +11,8 @@ public enum WeaponType
     Unspecified,
     Pistol,
     Shotgun,
-    Smg
+    Smg,
+    AssaultRifle
 }
 
 [System.Serializable]

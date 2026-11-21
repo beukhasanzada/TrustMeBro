@@ -1,56 +1,33 @@
-/* ==========================================================================
-   MODERN MINIMALIST IN-GAME UI — TIME-AS-HEALTH PARKOUR SHOOTER
-   All palette, typography, radii, spacing, and animation durations live here.
-   ========================================================================== */
-
 :root {
     /* Palette */
-    --color-accent: #4ce0e8;
+    --color-accent: #3482dd;
     --color-accent-soft: rgba(76, 224, 232, 0.28);
     --color-danger: #ff543e;
     --color-danger-edge: rgba(255, 84, 62, 0.34);
-    --color-slow: #6cc8ff;
     --color-slow-edge: rgba(108, 200, 255, 0.24);
 
     --color-white: #ffffff;
     --color-white-75: rgba(255, 255, 255, 0.75);
-    --color-white-40: rgba(255, 255, 255, 0.4);
-    --color-white-16: rgba(255, 255, 255, 0.16);
-    --color-white-08: rgba(255, 255, 255, 0.08);
 
-    --color-panel: rgba(10, 14, 20, 0.48);
-    --color-panel-strong: rgba(10, 14, 20, 0.68);
-    --color-overlay-pause: rgba(6, 9, 14, 0.66);
-    --color-overlay-death: rgba(6, 8, 12, 0.88);
+    --color-overlay-pause: rgba(16, 33, 64, 0.67);
+    --color-overlay-death: rgba(32, 26, 54, 0.79);
     --color-black: #05070a;
 
-    /* Font slot — swap to a custom FontAsset anytime:
+    /* Font slot вЂ” swap to a custom FontAsset anytime:
        --font-main: url("project://database/Assets/Fonts/Inter.asset"); */
-    --font-main: initial;
 
     /* Typography */
-    --font-size-title: 44px;
-    --font-size-ammo: 42px;
-    --font-size-heading: 26px;
-    --font-size-button: 16px;
-    --font-size-chip: 13px;
+    --font-size-ammo: 27px;
     --font-size-micro: 11px;
-    --tracking-label: 3px;
-    --tracking-wide: 6px;
+    --tracking-label: 0.4px;
 
     /* Radii & Borders */
-    --radius-sm: 8px;
-    --radius-md: 10px;
-    --radius-lg: 12px;
     --radius-pill: 99px;
     --border-thin: 1px;
 
     /* Spacing */
-    --space-xs: 6px;
     --space-sm: 10px;
-    --space-md: 18px;
     --space-lg: 28px;
-    --space-xl: 42px;
 
     /* Durations */
     --dur-fast: 150ms;
@@ -58,12 +35,6 @@
     --dur-slow: 380ms;
 
     /* Element sizes */
-    --time-bar-width: 520px;
-    --time-bar-height: 8px;
-    --pip-width: 8px;
-    --pip-height: 22px;
-    --button-width: 240px;
-    --button-height: 44px;
 }
 
 /* ==========================================================================
@@ -77,7 +48,6 @@
     right: 0;
     bottom: 0;
     color: var(--color-white);
-    -unity-font-definition: var(--font-main);
 }
 
 .screen {
@@ -131,7 +101,7 @@
 }
 
 /* ==========================================================================
-   1. HUD — TIME BAR (TOP CENTER)
+   1. HUD вЂ” TIME BAR (TOP CENTER)
    ========================================================================== */
 
 .hud-root {
@@ -140,22 +110,13 @@
 
 .time-wrapper {
     position: absolute;
-    top: var(--space-lg);
-    align-self: center;
-    align-items: center;
-    padding-left: var(--space-md);
-    padding-right: var(--space-md);
-    padding-top: var(--space-sm);
-    padding-bottom: var(--space-sm);
-    background-color: var(--color-panel);
-    border-width: var(--border-thin);
-    border-color: var(--color-white-16);
-    border-radius: var(--radius-md);
+    top: 22px;
+    left: 22px;
+    width: 308px;
+    max-width: 56%;
     scale: 1 1;
-    translate: 0 0;
-    transition-property: scale, border-color, translate;
-    transition-duration: var(--dur-fast), var(--dur-mid), 80ms;
-    transition-timing-function: ease-out, ease-out, ease-out;
+    transition-property: scale, border-color;
+    transition-duration: var(--dur-fast), var(--dur-mid);
 }
 
 .time-wrapper--gain {
@@ -168,11 +129,8 @@
 }
 
 .time-header {
-    width: var(--time-bar-width);
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-xs);
+    width: 100%;
+    min-height: 26px;
 }
 
 .micro-label {
@@ -184,27 +142,24 @@
 }
 
 .time-gain-chevron {
-    font-size: var(--font-size-chip);
-    color: var(--color-accent);
+    font-size: 16px;
+    color: #cafea5;
     -unity-font-style: bold;
     opacity: 0;
-    translate: 0 4px;
-    transition-property: opacity, translate;
-    transition-duration: var(--dur-mid), var(--dur-mid);
-    transition-timing-function: ease-out, ease-out;
+    transition-property: opacity;
+    transition-duration: var(--dur-mid);
 }
 
 .time-gain-chevron--show {
     opacity: 1;
-    translate: 0 -4px;
 }
 
 .time-track {
-    width: var(--time-bar-width);
-    height: var(--time-bar-height);
-    background-color: var(--color-white-08);
-    border-radius: var(--radius-pill);
-    overflow: hidden;
+    height: 16px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    margin-left: 8px;
+    margin-right: 8px;
     position: relative;
 }
 
@@ -214,8 +169,7 @@
     top: 0;
     height: 100%;
     width: 100%;
-    background-color: var(--color-white-40);
-    border-radius: var(--radius-pill);
+    background-color: #b8cbe5;
 }
 
 .time-fill {
@@ -224,23 +178,20 @@
     top: 0;
     height: 100%;
     width: 100%;
-    background-color: var(--color-accent);
-    border-radius: var(--radius-pill);
-    transition-property: background-color;
-    transition-duration: var(--dur-mid);
-    transition-timing-function: ease-out;
+    background-color: #72bd4c;
+    -unity-background-image-tint-color: #8cde56;
 }
 
 .time-fill--gain {
-    background-color: var(--color-white);
+    -unity-background-image-tint-color: #d5fc97;
 }
 
 .time-fill--danger {
-    background-color: var(--color-danger);
+    -unity-background-image-tint-color: #fb944d;
 }
 
 .time-fill--hit-flash {
-    background-color: var(--color-danger);
+    -unity-background-image-tint-color: #fc6550;
 }
 
 .time-cap-notch {
@@ -254,132 +205,134 @@
 
 /* Subtle SLOWED chip below time bar */
 .slow-chip {
-    margin-top: var(--space-xs);
-    padding-left: var(--space-sm);
-    padding-right: var(--space-sm);
-    padding-top: 3px;
-    padding-bottom: 3px;
-    border-radius: var(--radius-sm);
-    border-width: var(--border-thin);
-    border-color: var(--color-slow);
-    background-color: var(--color-panel);
-    color: var(--color-slow);
-    font-size: var(--font-size-micro);
-    letter-spacing: var(--tracking-label);
-    opacity: 0;
-    translate: 0 -6px;
-    transition-property: opacity, translate;
-    transition-duration: var(--dur-fast), var(--dur-fast);
-    transition-timing-function: ease-out, ease-out;
+    display: none;
+    align-self: flex-start;
+    margin: 0 8px 7px 8px;
+    padding: 3px 6px;
+    border-width: 1px;
+    border-color: #7594c3;
+    border-radius: 3px;
+    color: #244b8c;
+    background-color: #e3edfb;
+    font-size: 11px;
+    -unity-font-style: bold;
 }
 
 .slow-chip--active {
-    opacity: 1;
-    translate: 0 0;
+    display: flex;
 }
 
 /* Slim digit-free Boss health bar under the Time Bar */
 .boss-bar-wrapper {
-    width: var(--time-bar-width);
-    margin-top: var(--space-sm);
-    padding-top: var(--space-xs);
-    border-top-width: var(--border-thin);
-    border-top-color: var(--color-white-16);
-    flex-direction: column;
-    align-items: center;
+    margin: 0 8px 8px 8px;
+    border-top-width: 1px;
+    border-top-color: #aeb9cd;
+    padding-top: 5px;
 }
 
 .boss-bar-label {
-    color: var(--color-danger);
-    margin-bottom: 4px;
+    color: #a63032;
+    margin-bottom: 3px;
 }
 
 .boss-bar-track {
-    width: 100%;
-    height: 5px;
-    background-color: var(--color-white-08);
-    border-radius: var(--radius-pill);
+    height: 8px;
+    background-color: #d3dae6;
     overflow: hidden;
 }
 
 .boss-bar-fill {
     width: 100%;
     height: 100%;
-    background-color: var(--color-danger);
-    border-radius: var(--radius-pill);
+    background-color: #c64b49;
     transition-property: width;
     transition-duration: var(--dur-fast);
-    transition-timing-function: ease-out;
 }
 
 /* ==========================================================================
-   2. HUD — AMMO (BOTTOM RIGHT)
+   2. HUD вЂ” AMMO (BOTTOM RIGHT)
    ========================================================================== */
 
 .ammo-panel {
     position: absolute;
-    right: var(--space-lg);
-    bottom: var(--space-lg);
-    flex-direction: column;
-    align-items: flex-end;
-    padding-left: var(--space-md);
-    padding-right: var(--space-md);
-    padding-top: var(--space-sm);
-    padding-bottom: var(--space-sm);
-    background-color: var(--color-panel);
-    border-width: var(--border-thin);
-    border-color: var(--color-white-16);
-    border-radius: var(--radius-md);
+    right: 22px;
+    bottom: 22px;
+    width: 205px;
+    max-width: 48%;
+}
+
+.ammo-body {
+    padding: 3px 8px 5px 8px;
+}
+
+.ammo-panel--empty .ammo-body {
+    display: none;
+}
+
+.ammo-magazine-size {
+    color: #415579;
+    font-size: 13px;
+    margin: 3px 0 0 2px;
+}
+
+.ammo-bottom-row {
+    flex-direction: row;
+    justify-content: space-between;
+    border-top-width: 1px;
+    border-top-color: #c8c2b4;
+    min-height: 16px;
+}
+
+.ammo-reserve {
+    color: #455674;
+    font-size: 11px;
 }
 
 .ammo-top-row {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
 }
 
 .ammo-pips {
+    flex-grow: 1;
     flex-direction: row;
     align-items: center;
-    margin-right: var(--space-md);
-    margin-bottom: 6px;
+    margin-right: 7px;
 }
 
 .ammo-pip {
-    width: var(--pip-width);
-    height: var(--pip-height);
-    margin-left: 5px;
-    background-color: var(--color-white);
-    border-radius: 3px;
-    opacity: 1;
-    translate: 0 0;
-    scale: 1 1;
-    transition-property: opacity, translate, scale, background-color;
-    transition-duration: var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast);
-    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+    width: 8px;
+    height: 15px;
+    margin-right: 3px;
+    background-color: #4681c4;
+    border-width: 1px;
+    border-color: #7eaddf #235381 #235381 #7eaddf;
+    border-radius: 2px;
+    transition-property: background-color;
+    transition-duration: var(--dur-fast);
 }
 
 .ammo-pip--spent {
-    opacity: 0.16;
-    translate: 0 6px;
-    scale: 0.85 0.85;
+    background-color: #d7d9d8;
+    border-color: #ccd0d6;
+    opacity: 1;
 }
 
 .ammo-pip--reloading {
-    background-color: var(--color-accent);
-    scale: 1.12 1.12;
+    background-color: #83c454;
+    border-color: #529333;
 }
 
 .ammo-count {
     font-size: var(--font-size-ammo);
-    color: var(--color-white);
-    min-width: 34px;
+    color: #18395f;
+    min-width: 33px;
+    -unity-font-style: bold;
     -unity-text-align: middle-right;
     margin: 0;
     padding: 0;
-    scale: 1 1;
     transition-property: scale, color;
     transition-duration: var(--dur-fast), var(--dur-fast);
-    transition-timing-function: ease-out, ease-out;
 }
 
 .ammo-count--punch {
@@ -392,17 +345,16 @@
 }
 
 .reload-hint {
-    margin-top: 2px;
-    font-size: var(--font-size-micro);
-    letter-spacing: var(--tracking-label);
-    color: var(--color-danger);
+    color: #a23528;
+    font-size: 11px;
+    -unity-font-style: bold;
     opacity: 0;
     transition-property: opacity;
     transition-duration: var(--dur-fast);
 }
 
 /* ==========================================================================
-   3. HUD — CROSSHAIR & HIT MARKER (CENTER)
+   3. HUD вЂ” CROSSHAIR & HIT MARKER (CENTER)
    ========================================================================== */
 
 .crosshair {
@@ -490,7 +442,7 @@
 .hit-tick--br { translate: 9px 9px;   rotate: 45deg; }
 
 /* ==========================================================================
-   4. HUD — BUFF LIST (TOP RIGHT)
+   4. HUD вЂ” BUFF LIST (TOP RIGHT)
    ========================================================================== */
 
 .buff-list {
@@ -504,20 +456,14 @@
 .buff-chip {
     flex-direction: row;
     align-items: center;
-    padding-left: var(--space-sm);
-    padding-right: var(--space-md);
-    padding-top: var(--space-xs);
-    padding-bottom: var(--space-xs);
-    margin-bottom: var(--space-xs);
-    background-color: var(--color-panel);
-    border-width: var(--border-thin);
-    border-color: var(--color-white-16);
-    border-radius: var(--radius-md);
-    opacity: 1;
-    translate: 0 0;
+    padding: 4px 8px;
+    margin-bottom: 5px;
+    background-color: #f2eddd;
+    border-width: 1px;
+    border-color: #3d6caa;
+    border-radius: 4px;
     transition-property: opacity, translate;
     transition-duration: var(--dur-mid), var(--dur-mid);
-    transition-timing-function: ease-out, ease-out;
 }
 
 .buff-chip--enter {
@@ -537,11 +483,8 @@
 }
 
 .buff-name {
-    font-size: var(--font-size-chip);
-    letter-spacing: var(--tracking-label);
-    color: var(--color-white);
-    margin: 0;
-    padding: 0;
+    color: #244367;
+    font-size: 13px;
 }
 
 /* ==========================================================================
@@ -567,157 +510,148 @@
 }
 
 .modal-card {
-    background-color: var(--color-panel-strong);
-    border-width: var(--border-thin);
-    border-color: var(--color-white-16);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    min-width: 340px;
-    align-items: center;
+    width: 420px;
+    max-width: 94%;
+    max-height: 94%;
 }
 
-.modal-card--danger {
-    border-color: var(--color-danger);
+.window-titlebar {
+    min-height: 34px;
+    padding-left: 11px;
 }
 
-.screen-title {
-    font-size: var(--font-size-title);
-    letter-spacing: var(--tracking-wide);
-    color: var(--color-white);
-    margin-bottom: var(--space-lg);
-    -unity-text-align: middle-center;
+.window-titlebar .retro-title {
+    font-size: 16px;
 }
 
-.screen-title--danger {
-    color: var(--color-danger);
+.window-body {
+    padding: 17px;
 }
 
-.button-stack {
-    flex-direction: column;
-    align-items: center;
+.button-row {
+    flex-direction: row;
 }
 
 .ui-button {
-    width: var(--button-width);
-    height: var(--button-height);
-    margin-bottom: var(--space-sm);
-    background-color: var(--color-white-08);
-    color: var(--color-white);
-    font-size: var(--font-size-button);
-    letter-spacing: var(--tracking-label);
-    border-width: var(--border-thin);
-    border-color: var(--color-white-16);
-    border-radius: var(--radius-sm);
-    scale: 1 1;
-    transition-property: scale, border-color, background-color, color;
-    transition-duration: var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast);
-    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+    min-height: 38px;
+    margin: 3px 0;
+    font-size: 14px;
+    white-space: normal;
 }
 
-.ui-button:hover {
-    scale: 1.03 1.03;
-    border-color: var(--color-white-75);
-    background-color: var(--color-white-16);
+.button-row .ui-button {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 3px;
+    margin-right: 3px;
 }
 
-.ui-button:focus {
-    scale: 1.04 1.04;
-    border-color: var(--color-accent);
-    background-color: var(--color-accent-soft);
-    color: var(--color-white);
+.window-footer {
+    margin: 11px 1px 0 1px;
+    padding: 8px 0 0 0;
+    border-top-width: 1px;
+    border-top-color: #c8c1af;
+    color: #4b5d79;
+    font-size: 11px;
+    -unity-text-align: middle-right;
 }
 
-.ui-button:active {
-    scale: 0.98 0.98;
-    background-color: var(--color-accent);
-    color: var(--color-black);
+.dialog-status {
+    margin: 1px 0 14px 0;
+    color: #18395f;
+    font-size: 21px;
+    -unity-font-style: bold;
 }
 
-/* Escape screen line fade-in */
-.escape-stack {
-    align-items: center;
-    justify-content: center;
+.dialog-status--danger {
+    color: #a0352f;
 }
 
 .escape-line {
-    font-size: var(--font-size-title);
-    letter-spacing: var(--tracking-wide);
-    color: var(--color-white);
-    margin-bottom: var(--space-md);
+    color: #18395f;
+    margin: 2px 0 7px 0;
+    font-size: 22px;
+    -unity-font-style: bold;
     opacity: 0;
-    translate: 0 10px;
-    transition-property: opacity, translate;
-    transition-duration: var(--dur-slow), var(--dur-slow);
-    transition-timing-function: ease-out, ease-out;
+    transition-property: opacity;
+    transition-duration: var(--dur-slow);
 }
 
 .escape-line--sub {
-    font-size: var(--font-size-heading);
-    color: var(--color-white-75);
-    margin-bottom: var(--space-xl);
-}
-
-.escape-line--visible {
-    opacity: 1;
-    translate: 0 0;
+    color: #445678;
+    font-size: 14px;
+    -unity-font-style: normal;
+    margin-bottom: 14px;
 }
 
 .escape-actions {
-    flex-direction: column;
-    align-items: center;
     opacity: 0;
-    translate: 0 10px;
-    transition-property: opacity, translate;
-    transition-duration: var(--dur-slow), var(--dur-slow);
-    transition-timing-function: ease-out, ease-out;
+    transition-property: opacity;
+    transition-duration: var(--dur-slow);
 }
 
+.escape-line--visible,
 .escape-actions--visible {
     opacity: 1;
-    translate: 0 0;
 }
 
 .hidden-display {
     display: none;
 }
 
-/* ==========================================================================
-   6. SETTINGS MENU
-   ========================================================================== */
-
 .modal-card--settings {
-    min-width: 440px;
+    width: 460px;
 }
 
 .settings-list {
-    width: 100%;
-    flex-direction: column;
-    margin-bottom: var(--space-lg);
+    background-color: #f9f6ed;
+    border-width: 1px;
+    border-color: #9daec2 #fffefa #fffefa #9daec2;
+    border-radius: 3px;
+    padding: 4px 12px;
+    margin-bottom: 8px;
 }
 
 .settings-row {
-    width: 100%;
-    flex-direction: column;
-    margin-bottom: var(--space-md);
+    padding-top: 8px;
+    padding-bottom: 6px;
 }
 
 .settings-row-header {
-    width: 100%;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-xs);
+}
+
+.settings-row-header .micro-label {
+    color: #253656;
+    font-size: 13px;
 }
 
 .settings-value {
-    font-size: var(--font-size-chip);
-    color: var(--color-accent);
-    letter-spacing: 1px;
-    margin: 0;
-    padding: 0;
+    font-size: 13px;
+    color: #235cac;
+    -unity-font-style: bold;
 }
 
 .settings-slider {
     width: 100%;
     margin: 0;
+}
+
+.settings-slider .unity-base-slider__tracker {
+    height: 5px;
+    background-color: #c3cfdb;
+    border-width: 1px;
+    border-color: #8195ae #fdfefe #fdfefe #8195ae;
+    border-radius: 2px;
+}
+
+.settings-slider .unity-base-slider__dragger {
+    width: 13px;
+    height: 17px;
+    background-color: #eaf4ff;
+    border-width: 1px;
+    border-color: #4072b4;
+    border-radius: 3px;
 }
