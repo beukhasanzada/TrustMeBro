@@ -15,7 +15,9 @@ public class UIManager : MonoBehaviour
     private enum ScreenState { Playing, Paused, Dead, Escaped }
 
     [Header("References (auto-found if empty)")]
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private RigidbodyFpsController fpsController;
+    [SerializeField] private WeaponController weaponController;
+    [SerializeField] private FpsCameraRig cameraRig;
     [SerializeField] private PlayerSlow playerSlow;
     [SerializeField] private TimeManager timeManager;
 
@@ -58,7 +60,9 @@ public class UIManager : MonoBehaviour
         hudController = GetComponent<HUDController>();
         pauseController = GetComponent<PauseController>();
 
-        if (playerController == null) playerController = FindFirstObjectByType<PlayerController>();
+        if (fpsController == null) fpsController = FindFirstObjectByType<RigidbodyFpsController>();
+        if (weaponController == null) weaponController = FindFirstObjectByType<WeaponController>();
+        if (cameraRig == null) cameraRig = FindFirstObjectByType<FpsCameraRig>();
         if (playerSlow == null) playerSlow = FindFirstObjectByType<PlayerSlow>();
         if (timeManager == null) timeManager = GetComponent<TimeManager>() ?? FindFirstObjectByType<TimeManager>();
     }
@@ -111,8 +115,8 @@ public class UIManager : MonoBehaviour
         btnEscapeMenu = root.Q<Button>("btn-escape-mainmenu");
         if (btnEscapeMenu != null) btnEscapeMenu.clicked += () => LoadSceneSafe(mainMenuSceneName);
 
-        hudController.Initialize(root, playerController, playerSlow, timeManager);
-        pauseController.Initialize(this, playerController, timeManager);
+        hudController.Initialize(root, weaponController, playerSlow, timeManager);
+        pauseController.Initialize(this, fpsController, weaponController, cameraRig, timeManager);
 
         if (timeManager != null)
         {
@@ -236,8 +240,7 @@ public class UIManager : MonoBehaviour
 #endif
     }
 
-    // Inspector context-menu test helpers
-    [ContextMenu("Test: Add Time (+5s)")]    private void DebugAddTime() => timeManager?.AddTime(5f);
+    [ContextMenu("Test: Add Time (+5s)")]     private void DebugAddTime() => timeManager?.AddTime(5f);
     [ContextMenu("Test: Remove Time (-10s)")] private void DebugRemoveTime() => timeManager?.RemoveTime(10f);
     [ContextMenu("Test: Trigger Time's Up")]  private void DebugShowDeath() => ShowDeath();
     [ContextMenu("Test: Show Escape")]        private void DebugShowEscape() => ShowEscape();

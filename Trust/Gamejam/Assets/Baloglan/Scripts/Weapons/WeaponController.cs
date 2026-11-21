@@ -83,6 +83,8 @@ public sealed class WeaponController : MonoBehaviour
     public WeaponAmmoState Ammo => equipped == null ? default
         : new WeaponAmmoState(equipped.Definition, equipped.Magazine, equipped.Reserve, reloadCompleteAt >= 0d);
     public event Action<WeaponAmmoState> AmmoChanged;
+    public event Action Fired;
+    public event Action TargetHit;
 
     void Awake()
     {
@@ -368,6 +370,7 @@ public sealed class WeaponController : MonoBehaviour
         recoilTarget.y = Mathf.Clamp(recoilTarget.y + UnityEngine.Random.Range(-1f, 1f), -maxStack, maxStack);
 
         PublishAmmo();
+        Fired?.Invoke();
         return true;
     }
 
@@ -447,7 +450,14 @@ public sealed class WeaponController : MonoBehaviour
         }
 
         if (nearest != null)
-            nearest.GetComponentInParent<IWeaponDamageable>()?.TakeWeaponDamage(definition.DamagePerPellet);
+        {
+            IWeaponDamageable damageable = nearest.GetComponentInParent<IWeaponDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeWeaponDamage(definition.DamagePerPellet);
+                TargetHit?.Invoke();
+            }
+        }
     }
 
     void PlaySfx(AudioClip clip)

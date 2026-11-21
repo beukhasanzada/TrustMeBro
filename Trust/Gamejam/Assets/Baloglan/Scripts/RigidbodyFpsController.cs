@@ -17,6 +17,8 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     [Header("Ground movement")]
     [SerializeField, Min(0f)] float walkSpeed = 9f;
     [SerializeField, Min(0f)] float sprintSpeed = 15f;
+    public float speedMultiplier = 1f;
+    public bool instantStop = true;
     [SerializeField, Min(0f)] float groundAcceleration = 80f;
     [SerializeField, Min(0f)] float groundBraking = 28f;
     [SerializeField, Min(0f)] float groundTurnSpeed = 540f;
@@ -276,20 +278,22 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         }
         else if (direction == Vector3.zero)
         {
-            tangent = Vector3.MoveTowards(tangent, Vector3.zero, groundBraking * dt);
+            tangent = instantStop
+                ? Vector3.zero
+                : Vector3.MoveTowards(tangent, Vector3.zero, groundBraking * dt);
         }
         else
         {
-            float targetSpeed = sprintHeld ? sprintSpeed : walkSpeed;
+            float targetSpeed = (sprintHeld ? sprintSpeed : walkSpeed) * speedMultiplier;
             if (StanceDrop > 0f)
-                targetSpeed = walkSpeed * 0.55f;
+                targetSpeed = walkSpeed * 0.55f * speedMultiplier;
 
             Vector3 target = direction * (targetSpeed * moveInput.magnitude);
             // Retain overspeed from a dash, slide or landing while the player steers.
             tangent = speed > target.magnitude
                 ? Vector3.RotateTowards(tangent, target, groundTurnSpeed * Mathf.Deg2Rad * dt,
                     momentumDeceleration * dt)
-                : Vector3.MoveTowards(tangent, target, groundAcceleration * dt);
+                : (instantStop ? target : Vector3.MoveTowards(tangent, target, groundAcceleration * dt));
         }
 
         return tangent - normal * GroundStickSpeed;
@@ -421,7 +425,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         UpdateStance(false);
         float speed = Vector3.Dot(velocity, tangent);
         float dt = Time.fixedDeltaTime;
-        speed = Mathf.MoveTowards(speed, Mathf.Max(speed, wallrunSpeed), wallrunAcceleration * dt);
+        speed = Mathf.MoveTowards(speed, Mathf.Max(speed, wallrunSpeed * speedMultiplier), wallrunAcceleration * dt);
         float verticalSpeed = Mathf.Clamp(velocity.y - wallrunGravity * dt, -2.8f, 2.4f);
         return tangent * speed - normal * GroundStickSpeed + Vector3.up * verticalSpeed;
     }

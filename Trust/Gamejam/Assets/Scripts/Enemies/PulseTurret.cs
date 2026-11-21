@@ -17,7 +17,7 @@ public class PulseTurret : EnemyBase
 
     private void Reset()
     {
-        health = 3;
+        health = 75;
         secondsReward = 6f;
     }
 

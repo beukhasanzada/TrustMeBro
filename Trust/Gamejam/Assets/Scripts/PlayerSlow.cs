@@ -6,10 +6,10 @@ using UnityEngine;
 /// Owns player slow effects (timed orb slows and continuous field slows).
 /// Writes PlayerController.speedMultiplier and notifies the HUD.
 /// </summary>
-[RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof(RigidbodyFpsController))]
 public class PlayerSlow : MonoBehaviour
 {
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private RigidbodyFpsController fpsController;
 
     private readonly Dictionary<object, float> fieldSlows = new Dictionary<object, float>();
     private float timedMultiplier = 1f;
@@ -20,8 +20,8 @@ public class PlayerSlow : MonoBehaviour
 
     private void Awake()
     {
-        if (playerController == null)
-            playerController = GetComponent<PlayerController>();
+        if (fpsController == null)
+            fpsController = GetComponent<RigidbodyFpsController>();
     }
 
     private void Update()
@@ -67,8 +67,8 @@ public class PlayerSlow : MonoBehaviour
         foreach (float m in fieldSlows.Values)
             effective = Mathf.Min(effective, m);
 
-        if (playerController != null)
-            playerController.speedMultiplier = effective;
+        if (fpsController != null)
+            fpsController.speedMultiplier = effective;
 
         bool nowSlowed = effective < 0.999f;
         if (nowSlowed != IsSlowed)
@@ -80,7 +80,7 @@ public class PlayerSlow : MonoBehaviour
 
     private void OnDisable()
     {
-        if (playerController != null)
-            playerController.speedMultiplier = 1f;
+        if (fpsController != null)
+            fpsController.speedMultiplier = 1f;
     }
 }

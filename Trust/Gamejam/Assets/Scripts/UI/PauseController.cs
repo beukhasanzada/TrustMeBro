@@ -4,12 +4,15 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Toggles Pause on Esc (New Input System), manages Time.timeScale, TimeManager, cursor,
-/// and disables/enables PlayerController. Always resets Time.timeScale = 1 on scene load.
+/// and disables/enables RigidbodyFpsController, WeaponController, and FpsCameraRig.
+/// Always resets Time.timeScale = 1 on scene load.
 /// </summary>
 public class PauseController : MonoBehaviour
 {
     private UIManager uiManager;
-    private PlayerController playerController;
+    private RigidbodyFpsController fpsController;
+    private WeaponController weaponController;
+    private FpsCameraRig cameraRig;
     private TimeManager timeManager;
 
     public bool IsPaused { get; private set; }
@@ -26,10 +29,17 @@ public class PauseController : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    public void Initialize(UIManager manager, PlayerController controller, TimeManager timer)
+    public void Initialize(
+        UIManager manager,
+        RigidbodyFpsController fps,
+        WeaponController weapon,
+        FpsCameraRig rig,
+        TimeManager timer)
     {
         uiManager = manager;
-        playerController = controller;
+        fpsController = fps;
+        weaponController = weapon;
+        cameraRig = rig;
         timeManager = timer;
         IsPaused = false;
         Time.timeScale = 1f;
@@ -74,8 +84,9 @@ public class PauseController : MonoBehaviour
 
     public void SetGameplayControlActive(bool active)
     {
-        if (playerController != null)
-            playerController.enabled = active;
+        if (fpsController != null) fpsController.enabled = active;
+        if (weaponController != null) weaponController.enabled = active;
+        if (cameraRig != null) cameraRig.enabled = active;
 
         UnityEngine.Cursor.lockState = active ? CursorLockMode.Locked : CursorLockMode.None;
         UnityEngine.Cursor.visible = !active;

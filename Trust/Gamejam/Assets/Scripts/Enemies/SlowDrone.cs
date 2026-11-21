@@ -35,7 +35,7 @@ public class SlowDrone : EnemyBase
 
     private void Start()
     {
-        PlayerController pc = FindFirstObjectByType<PlayerController>();
+        RigidbodyFpsController pc = FindFirstObjectByType<RigidbodyFpsController>();
         if (pc != null) player = pc.transform;
     }
 

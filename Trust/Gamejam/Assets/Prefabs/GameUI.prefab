@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b2c3d4e5f647889900112233445506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
+  weaponController: {fileID: 0}
   playerSlow: {fileID: 0}
   timeManager: {fileID: 1000000000000000007}
   lowTimeThreshold: 0.25
@@ -124,7 +124,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b2c3d4e5f647889900112233445504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
+  fpsController: {fileID: 0}
+  weaponController: {fileID: 0}
+  cameraRig: {fileID: 0}
   playerSlow: {fileID: 0}
   timeManager: {fileID: 1000000000000000007}
   mainMenuSceneName: MainMenu

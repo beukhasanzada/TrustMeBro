@@ -4,10 +4,10 @@ using UnityEngine;
 /// <summary>
 /// Base class for enemies. Rewards time via TimeManager on death and plays a quick scale-down/VFX hook.
 /// </summary>
-public abstract class EnemyBase : MonoBehaviour
+public abstract class EnemyBase : MonoBehaviour, IWeaponDamageable
 {
     [Header("Enemy Stats")]
-    public int health = 1;
+    public int health = 25;
     public float secondsReward = 3f;
 
     [Header("Death Effect")]
@@ -20,6 +20,11 @@ public abstract class EnemyBase : MonoBehaviour
     protected virtual void Awake()
     {
         baseScale = transform.localScale;
+    }
+
+    public void TakeWeaponDamage(float damage)
+    {
+        TakeHit(Mathf.Max(1, Mathf.CeilToInt(damage)));
     }
 
     public virtual void TakeHit(int damage)

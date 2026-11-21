@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Event-driven HUD: Time bar (no numbers), 7-pip ammo with reload wave, crosshair + hit marker,
-/// boss buff chips, and slow-state cue.
+/// Event-driven HUD: Time bar (no numbers), ammo pips + reload wave synced to WeaponController,
+/// crosshair + hit marker, boss buff chips, and slow-state cue.
 /// </summary>
 public class HUDController : MonoBehaviour
 {
     [Header("References (auto-found if empty)")]
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private WeaponController weaponController;
     [SerializeField] private PlayerSlow playerSlow;
     [SerializeField] private TimeManager timeManager;
 
@@ -50,7 +49,7 @@ public class HUDController : MonoBehaviour
     private float trailWaitTimer;
     private float shakeTimer;
 
-    private int lastAmmo = -1;
+    private WeaponAmmoState currentAmmo;
     private bool wasReloading;
     private float reloadElapsed;
 
@@ -59,9 +58,9 @@ public class HUDController : MonoBehaviour
     private IVisualElementScheduledItem fireResetSchedule;
     private IVisualElementScheduledItem hitResetSchedule;
 
-    public void Initialize(VisualElement root, PlayerController controller, PlayerSlow slow, TimeManager manager)
+    public void Initialize(VisualElement root, WeaponController weapon, PlayerSlow slow, TimeManager manager)
     {
-        if (controller != null) playerController = controller;
+        if (weapon != null) weaponController = weapon;
         if (slow != null) playerSlow = slow;
         if (manager != null) timeManager = manager;
 
@@ -94,12 +93,15 @@ public class HUDController : MonoBehaviour
             ApplyTimeBarWidths();
         }
 
-        if (playerController != null)
+        if (weaponController != null)
         {
-            playerController.OnShootStarted -= HandleEnemyHit;
-            playerController.OnShootStarted += HandleEnemyHit;
-            lastAmmo = playerController.ammo;
-            UpdateAmmoVisuals(lastAmmo, animateShot: false);
+            weaponController.AmmoChanged -= HandleAmmoChanged;
+            weaponController.AmmoChanged += HandleAmmoChanged;
+            weaponController.Fired -= HandleWeaponFired;
+            weaponController.Fired += HandleWeaponFired;
+            weaponController.TargetHit -= HandleTargetHit;
+            weaponController.TargetHit += HandleTargetHit;
+            HandleAmmoChanged(weaponController.Ammo);
         }
 
         if (playerSlow != null)
@@ -113,7 +115,12 @@ public class HUDController : MonoBehaviour
     private void OnDestroy()
     {
         if (timeManager != null) timeManager.OnTimeChanged -= HandleTimeChanged;
-        if (playerController != null) playerController.OnShootStarted -= HandleEnemyHit;
+        if (weaponController != null)
+        {
+            weaponController.AmmoChanged -= HandleAmmoChanged;
+            weaponController.Fired -= HandleWeaponFired;
+            weaponController.TargetHit -= HandleTargetHit;
+        }
         if (playerSlow != null) playerSlow.OnSlowStateChanged -= HandleSlowChanged;
     }
 
@@ -121,7 +128,7 @@ public class HUDController : MonoBehaviour
     {
         float dt = Time.deltaTime;
         UpdateTimeBarAnimation(dt);
-        UpdateAmmoAndReload(dt);
+        UpdateReloadAndEmptyPulse(dt);
     }
 
     // ------------------------------------------------------------------ Time Bar
@@ -132,13 +139,11 @@ public class HUDController : MonoBehaviour
 
         if (delta > 0f)
         {
-            // Time gained on kill: ease-out expand, glow, subtle pulse, "+" chevron
             TriggerTimeGainFeedback();
             trailNormalized = Mathf.Max(trailNormalized, targetNormalized);
         }
         else if (delta <= -hazardShakeMinLoss)
         {
-            // Discrete hazard time loss: shake bar + delay trail
             shakeTimer = 0.22f;
             trailWaitTimer = trailDelay;
         }
@@ -152,13 +157,11 @@ public class HUDController : MonoBehaviour
     {
         if (timeFill == null) return;
 
-        // Smooth ease-out expand on gain; immediate smooth drain on decrease
         if (targetNormalized > displayNormalized)
             displayNormalized = Mathf.Lerp(displayNormalized, targetNormalized, 1f - Mathf.Exp(-gainLerpSpeed * dt));
         else
             displayNormalized = targetNormalized;
 
-        // Delayed lighter trail behind main fill
         if (trailNormalized > displayNormalized)
         {
             if (trailWaitTimer > 0f)
@@ -173,7 +176,6 @@ public class HUDController : MonoBehaviour
 
         ApplyTimeBarWidths();
 
-        // Low-time & critical-time pulsing
         bool isLow = targetNormalized <= lowTimeThreshold && targetNormalized > 0f;
         bool isCritical = targetNormalized <= criticalTimeThreshold && targetNormalized > 0f;
 
@@ -201,7 +203,6 @@ public class HUDController : MonoBehaviour
             }
         }
 
-        // Hazard shake
         if (shakeTimer > 0f && timeWrapper != null)
         {
             shakeTimer -= dt;
@@ -235,101 +236,49 @@ public class HUDController : MonoBehaviour
 
     // ------------------------------------------------------------------ Ammo & Crosshair
 
-    private void UpdateAmmoAndReload(float dt)
+    private void HandleAmmoChanged(WeaponAmmoState state)
     {
-        if (playerController == null) return;
+        currentAmmo = state;
 
-        bool reloading = playerController.IsReloading;
-        int ammo = playerController.ammo;
-
-        if (reloading)
+        if (state.IsReloading && !wasReloading)
         {
-            if (!wasReloading)
-            {
-                wasReloading = true;
-                reloadElapsed = 0f;
-            }
-
-            reloadElapsed += dt;
-            float duration = Mathf.Max(0.05f, playerController.reloadDuration);
-            float progress = Mathf.Clamp01(reloadElapsed / duration);
-            int waveCount = Mathf.FloorToInt(progress * ammoPips.Count);
-
+            wasReloading = true;
+            reloadElapsed = 0f;
+        }
+        else if (!state.IsReloading && wasReloading)
+        {
+            wasReloading = false;
             for (int i = 0; i < ammoPips.Count; i++)
-            {
-                bool filled = i < waveCount;
-                ammoPips[i].EnableInClassList("ammo-pip--spent", !filled);
-                ammoPips[i].EnableInClassList("ammo-pip--reloading", filled);
-            }
-
-            if (reloadHintLabel != null)
-                reloadHintLabel.style.opacity = 0f;
+                ammoPips[i].RemoveFromClassList("ammo-pip--reloading");
         }
-        else
-        {
-            if (wasReloading)
-            {
-                wasReloading = false;
-                for (int i = 0; i < ammoPips.Count; i++)
-                    ammoPips[i].RemoveFromClassList("ammo-pip--reloading");
-                UpdateAmmoVisuals(ammo, animateShot: false);
-                lastAmmo = ammo;
-            }
-            else if (ammo != lastAmmo)
-            {
-                bool fired = ammo < lastAmmo;
-                lastAmmo = ammo;
-                UpdateAmmoVisuals(ammo, animateShot: fired);
-                if (fired) TriggerCrosshairFire();
-            }
 
-            // Gentle pulse on "RELOAD" hint when empty
-            if (reloadHintLabel != null)
-            {
-                bool empty = ammo <= 0;
-                reloadHintLabel.style.opacity = empty
-                    ? 0.4f + 0.6f * (0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 5f))
-                    : 0f;
-            }
-        }
+        UpdateAmmoVisuals(state);
     }
 
-    private void UpdateAmmoVisuals(int ammo, bool animateShot)
+    private void HandleWeaponFired()
     {
         if (ammoCountLabel != null)
         {
-            ammoCountLabel.text = ammo.ToString();
-            ammoCountLabel.EnableInClassList("ammo-count--empty", ammo <= 0);
-
-            if (animateShot)
+            ammoCountLabel.AddToClassList("ammo-count--punch");
+            punchResetSchedule?.Pause();
+            punchResetSchedule = ammoCountLabel.schedule.Execute(() =>
             {
-                ammoCountLabel.AddToClassList("ammo-count--punch");
-                punchResetSchedule?.Pause();
-                punchResetSchedule = ammoCountLabel.schedule.Execute(() =>
-                {
-                    ammoCountLabel.RemoveFromClassList("ammo-count--punch");
-                }).StartingIn(130);
-            }
+                ammoCountLabel.RemoveFromClassList("ammo-count--punch");
+            }).StartingIn(130);
         }
 
-        for (int i = 0; i < ammoPips.Count; i++)
+        if (crosshair != null)
         {
-            ammoPips[i].EnableInClassList("ammo-pip--spent", i >= ammo);
+            crosshair.AddToClassList("crosshair--fired");
+            fireResetSchedule?.Pause();
+            fireResetSchedule = crosshair.schedule.Execute(() =>
+            {
+                crosshair.RemoveFromClassList("crosshair--fired");
+            }).StartingIn(fireExpandMs);
         }
     }
 
-    private void TriggerCrosshairFire()
-    {
-        if (crosshair == null) return;
-        crosshair.AddToClassList("crosshair--fired");
-        fireResetSchedule?.Pause();
-        fireResetSchedule = crosshair.schedule.Execute(() =>
-        {
-            crosshair.RemoveFromClassList("crosshair--fired");
-        }).StartingIn(fireExpandMs);
-    }
-
-    private void HandleEnemyHit(object sender, EventArgs e)
+    private void HandleTargetHit()
     {
         if (hitMarker == null) return;
         hitMarker.AddToClassList("hit-marker--show");
@@ -338,6 +287,72 @@ public class HUDController : MonoBehaviour
         {
             hitMarker.RemoveFromClassList("hit-marker--show");
         }).StartingIn(hitMarkerMs);
+    }
+
+    private void UpdateReloadAndEmptyPulse(float dt)
+    {
+        if (currentAmmo.Weapon == null) return;
+
+        if (currentAmmo.IsReloading)
+        {
+            reloadElapsed += dt;
+            float duration = Mathf.Max(0.05f, currentAmmo.Weapon.ReloadSeconds);
+            float progress = Mathf.Clamp01(reloadElapsed / duration);
+            int activePipCount = GetVisiblePipCount(currentAmmo.MagazineCapacity);
+            int waveCount = Mathf.FloorToInt(progress * activePipCount);
+
+            for (int i = 0; i < ammoPips.Count; i++)
+            {
+                bool visible = i < activePipCount;
+                ammoPips[i].EnableInClassList("hidden-display", !visible);
+                if (!visible) continue;
+
+                bool filled = i < waveCount;
+                ammoPips[i].EnableInClassList("ammo-pip--spent", !filled);
+                ammoPips[i].EnableInClassList("ammo-pip--reloading", filled);
+            }
+
+            if (reloadHintLabel != null) reloadHintLabel.style.opacity = 0f;
+            return;
+        }
+
+        if (reloadHintLabel != null)
+        {
+            bool empty = currentAmmo.InMagazine <= 0;
+            reloadHintLabel.style.opacity = empty
+                ? 0.4f + 0.6f * (0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 5f))
+                : 0f;
+        }
+    }
+
+    private void UpdateAmmoVisuals(WeaponAmmoState state)
+    {
+        bool hasWeapon = state.Weapon != null;
+        if (ammoCountLabel != null)
+        {
+            ammoCountLabel.text = hasWeapon ? state.InMagazine.ToString() : "--";
+            ammoCountLabel.EnableInClassList("ammo-count--empty", hasWeapon && state.InMagazine <= 0);
+        }
+
+        int capacity = hasWeapon ? Mathf.Max(1, state.MagazineCapacity) : 0;
+        int visiblePips = GetVisiblePipCount(capacity);
+        int filledPips = !hasWeapon || state.InMagazine <= 0
+            ? 0
+            : Mathf.Clamp(Mathf.CeilToInt((float)state.InMagazine / capacity * visiblePips), 1, visiblePips);
+
+        for (int i = 0; i < ammoPips.Count; i++)
+        {
+            bool visible = i < visiblePips;
+            ammoPips[i].EnableInClassList("hidden-display", !visible);
+            if (visible)
+                ammoPips[i].EnableInClassList("ammo-pip--spent", i >= filledPips);
+        }
+    }
+
+    private int GetVisiblePipCount(int magazineCapacity)
+    {
+        if (magazineCapacity <= 0) return 0;
+        return Mathf.Min(magazineCapacity, ammoPips.Count);
     }
 
     public void SetCrosshairEnemy(bool isEnemy)
@@ -389,7 +404,6 @@ public class HUDController : MonoBehaviour
         list.Add(chip);
         buffChips[buffName] = chip;
 
-        // Slide in from the right on next tick
         chip.schedule.Execute(() => chip.RemoveFromClassList("buff-chip--enter")).StartingIn(16);
     }
 
