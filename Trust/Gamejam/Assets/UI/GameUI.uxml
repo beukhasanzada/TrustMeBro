@@ -1,0 +1,80 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/GameUI.uss?fileID=7433441132597879392&amp;guid=a1b2c3d4e5f647889900112233445501&amp;type=3#GameUI"/>
+    <ui:VisualElement name="root" picking-mode="Ignore" class="ui-root">
+        <ui:VisualElement name="danger-vignette" picking-mode="Ignore" class="vignette vignette--danger"/>
+        <ui:VisualElement name="slow-vignette" picking-mode="Ignore" class="vignette vignette--slow"/>
+        <ui:VisualElement name="pause-root" picking-mode="Ignore" class="screen overlay-pause screen--hidden">
+            <ui:VisualElement class="modal-card">
+                <ui:Label text="PAUSED" class="screen-title"/>
+                <ui:VisualElement class="button-stack">
+                    <ui:Button name="btn-resume" text="RESUME" class="ui-button" style="-unity-text-align: middle-center; background-color: rgba(13, 0, 190, 0.08);"/>
+                    <ui:Button name="btn-restart" text="RESTART" class="ui-button"/>
+                    <ui:Button name="btn-pause-mainmenu" text="MAIN MENU" class="ui-button"/>
+                    <ui:Button name="btn-quit" text="QUIT" class="ui-button" style="background-color: rgba(13, 0, 190, 0.08);"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="death-root" picking-mode="Ignore" class="screen screen--death overlay-death screen--hidden">
+            <ui:VisualElement class="modal-card modal-card--danger">
+                <ui:Label text="OUT OF TIME" class="screen-title screen-title--danger"/>
+                <ui:VisualElement class="button-stack">
+                    <ui:Button name="btn-retry" text="RETRY" class="ui-button"/>
+                    <ui:Button name="btn-death-mainmenu" text="MAIN MENU" class="ui-button"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="escape-root" picking-mode="Ignore" class="screen overlay-escape screen--hidden">
+            <ui:VisualElement class="escape-stack">
+                <ui:Label name="escape-line-1" text="You escaped." class="escape-line"/>
+                <ui:Label name="escape-line-2" text="Thanks for playing." class="escape-line escape-line--sub"/>
+                <ui:VisualElement name="escape-actions" class="escape-actions">
+                    <ui:Button name="btn-escape-nextlevel" text="NEXT LEVEL" class="ui-button hidden-display"/>
+                    <ui:Button name="btn-escape-mainmenu" text="MAIN MENU" class="ui-button"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="hud-root" picking-mode="Ignore" class="screen hud-root" style="top: 0; bottom: 1px; right: -1px; left: 2px;">
+        <ui:VisualElement name="time-wrapper" picking-mode="Ignore" class="time-wrapper" style="background-color: rgba(13, 0, 190, 0.475);">
+            <ui:VisualElement picking-mode="Ignore" class="time-header">
+                <ui:Label text="TIME" picking-mode="Ignore" class="micro-label"/>
+                <ui:Label name="time-gain-chevron" text="+" picking-mode="Ignore" class="time-gain-chevron"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="time-track" picking-mode="Ignore" class="time-track">
+                <ui:VisualElement name="time-trail" picking-mode="Ignore" class="time-trail"/>
+                <ui:VisualElement name="time-fill" picking-mode="Ignore" class="time-fill" style="scale: 1 1.3;"/>
+                <ui:VisualElement name="time-cap-notch" picking-mode="Ignore" class="time-cap-notch"/>
+            </ui:VisualElement>
+            <ui:Label name="slow-chip" text="SLOWED" picking-mode="Ignore" class="slow-chip"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="buff-list" picking-mode="Ignore" class="buff-list"/>
+        <ui:VisualElement name="crosshair" picking-mode="Ignore" class="crosshair">
+            <ui:VisualElement picking-mode="Ignore" class="crosshair-dot"/>
+            <ui:VisualElement picking-mode="Ignore" class="crosshair-arm crosshair-arm--top"/>
+            <ui:VisualElement picking-mode="Ignore" class="crosshair-arm crosshair-arm--bottom"/>
+            <ui:VisualElement picking-mode="Ignore" class="crosshair-arm crosshair-arm--left"/>
+            <ui:VisualElement picking-mode="Ignore" class="crosshair-arm crosshair-arm--right"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="hit-marker" picking-mode="Ignore" class="hit-marker">
+            <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--tl" style="background-color: rgb(153, 23, 23);"/>
+            <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--tr" style="background-color: rgb(153, 23, 23);"/>
+            <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--bl" style="background-color: rgb(153, 23, 23);"/>
+            <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--br" style="background-color: rgb(153, 23, 23);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="ammo-panel" picking-mode="Ignore" class="ammo-panel" style="background-color: rgba(13, 0, 190, 0.48);">
+            <ui:VisualElement picking-mode="Ignore" class="ammo-top-row">
+                <ui:VisualElement name="ammo-pips" picking-mode="Ignore" class="ammo-pips">
+                    <ui:VisualElement name="ammo-pip-0" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-1" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-2" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-3" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-4" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-5" picking-mode="Ignore" class="ammo-pip"/>
+                    <ui:VisualElement name="ammo-pip-6" picking-mode="Ignore" class="ammo-pip"/>
+                </ui:VisualElement>
+                <ui:Label name="ammo-count" text="7" picking-mode="Ignore" class="ammo-count"/>
+            </ui:VisualElement>
+            <ui:Label name="reload-hint" text="RELOAD" picking-mode="Ignore" class="reload-hint"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
