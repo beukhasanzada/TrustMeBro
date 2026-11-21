@@ -3,7 +3,6 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private float hp = 100f;
-    [SerializeField] private float bonusTime = 2f;
 
     public bool isDead { get; private set; }
 
@@ -20,8 +19,6 @@ public class Enemy : MonoBehaviour
         isDead = true;
 
         SoundManager.Instance.PlayDeath(transform.position);
-        if (GameTimer.Instance != null)
-            GameTimer.Instance.AddTime(bonusTime);
 
         Destroy(gameObject);
     }

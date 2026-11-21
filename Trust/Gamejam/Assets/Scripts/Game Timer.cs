@@ -90,6 +90,15 @@ public class GameTimer : MonoBehaviour
         Time.timeScale = 0f;   // останавливаем игру
     }
 
+    // Мгновенная смерть игрока
+    public void KillPlayer()
+    {
+        if (isOver) return;
+
+        TimeLeft = 0f;
+        GameOver();
+    }
+
     public void Restart()
     {
         Time.timeScale = 1f;
