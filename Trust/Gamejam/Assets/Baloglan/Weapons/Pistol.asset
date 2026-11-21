@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04225b48ced140e9ac66ad6fc3e18160, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Pistol
+  weaponType: 1
+  viewModel: {fileID: 3176495645511840500, guid: 902a68fc5e02fa442b0d348a21d2de5a, type: 3}
+  pickupPrefab: {fileID: 57778005211691504, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+  fireMode: 0
+  roundsPerMinute: 360
+  damagePerPellet: 25
+  pelletsPerShot: 1
+  spreadDegrees: 0
+  range: 80
+  magazineCapacity: 12
+  startingReserve: 48
+  reloadSeconds: 1.1
+  shootSfx: {fileID: 8300000, guid: 145c3910574afe24d8cf0c28bf63a2fd, type: 3}
+  reloadSfx: {fileID: 8300000, guid: be12e332ef640ca4c821ef1bfe04f660, type: 3}
+  recoil:
+    cameraPitch: 2.1
+    cameraYaw: 0.5
+    viewModelPitch: 5
+    viewModelRoll: 1.5
+    kickbackDistance: 0.045
+    kickSpeed: 42
+    returnSpeed: 12
+    maxStack: 2.5

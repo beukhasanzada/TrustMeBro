@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04225b48ced140e9ac66ad6fc3e18160, type: 3}
+  m_Name: TripleShotgun
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Triple-Barrel Shotgun
+  weaponType: 2
+  viewModel: {fileID: 2095925414478935827, guid: ca42cd7cb27de194981af208430321f3, type: 3}
+  pickupPrefab: {fileID: 2408077191949057883, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+  fireMode: 0
+  roundsPerMinute: 135
+  damagePerPellet: 11
+  pelletsPerShot: 8
+  spreadDegrees: 6.5
+  range: 42
+  magazineCapacity: 3
+  startingReserve: 18
+  reloadSeconds: 1.8000001
+  shootSfx: {fileID: 8300000, guid: 1fc2f19539db24f4693a43a720ce4c7f, type: 3}
+  reloadSfx: {fileID: 8300000, guid: f40b4cc79d2017e4bbd90562f344ee35, type: 3}
+  recoil:
+    cameraPitch: 3.8
+    cameraYaw: 0.75
+    viewModelPitch: 8
+    viewModelRoll: 2.4
+    kickbackDistance: 0.072
+    kickSpeed: 38
+    returnSpeed: 10
+    maxStack: 2
