@@ -52,6 +52,9 @@ public class GameTimer : MonoBehaviour
     {
         if (isOver) return;
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         TimeLeft += seconds;
         if (maxTime > 0f && TimeLeft > maxTime)
             TimeLeft = maxTime;

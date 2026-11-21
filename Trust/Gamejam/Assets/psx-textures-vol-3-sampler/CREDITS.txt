@@ -1,0 +1,8 @@
+Source materials: ambientCG (https://ambientcg.com), released under the Creative Commons CC0 1.0 Universal License.
+Credit is not required; it is given here anyway. The textures in this pack are converted versions of the following
+materials (file name = material id; page: https://ambientcg.com/a/<id>):
+
+
+marble: Marble012, Marble016, Marble005, Marble009, Marble008, Marble011, Marble003, Marble013, Marble018, Marble007, Marble026
+terrazzo: Terrazzo005, Terrazzo001, Terrazzo018, Terrazzo006, Terrazzo019L, Terrazzo012, Terrazzo002, Terrazzo008
+travertine-onyx: Travertine009, Travertine004, Travertine013, Onyx015, Onyx011, Onyx010

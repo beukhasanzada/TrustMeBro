@@ -1,0 +1,23 @@
+LICENSE — Nebula Drift (Stylized Sci-Fi Space Skyboxes Vol. 1)
+==============================================================
+
+Royalty-free commercial asset license.
+
+WHY THIS LICENSE IS CLEAN:
+  These skyboxes are 100% PROCEDURALLY GENERATED with our own numpy/Pillow engine.
+  No AI/ML models, no training data, no scraped, stock or third-party imagery was
+  used at any point. The output is original, machine-synthesised pixels we own
+  outright — so the license we grant you is unencumbered.
+
+YOU MAY:
+  - Use the skyboxes in unlimited personal and commercial projects (games, film,
+    VR/AR, archviz, renders, video, print).
+  - Modify, recolour, crop and reproject them for your needs.
+  - Use them in projects for clients.
+
+YOU MAY NOT:
+  - Resell or redistribute the files as-is, or as part of another asset pack /
+    template / NFT whose primary value is these skyboxes.
+
+No attribution required (appreciated). Provided 'as is', without warranty.
+© asset-forge. All rights reserved where not granted above.

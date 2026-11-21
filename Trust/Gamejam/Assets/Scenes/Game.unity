@@ -132,7 +132,8 @@ GameObject:
   - component: {fileID: 38877055}
   - component: {fileID: 38877054}
   - component: {fileID: 38877053}
-  - component: {fileID: 38877058}
+  - component: {fileID: 38877060}
+  - component: {fileID: 38877059}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -165,7 +166,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 64
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &38877054
 CapsuleCollider:
@@ -263,7 +264,7 @@ Transform:
   - {fileID: 742753772}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &38877058
+--- !u!114 &38877059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,14 +273,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 38877052}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d43ab646022bdb64ba99851627d70f0f, type: 3}
+  m_Script: {fileID: 11500000, guid: 422af11ff16e4cb4fa20faf498b70ee2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FallSound
-  minFallSpeed: 3
-  groundCheckDistance: 0.3
-  groundMask:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  forwardKey: 37
+  backKey: 33
+  leftKey: 15
+  rightKey: 18
+  jumpKey: 1
+  sprintKey: 51
+  cameraTransform: {fileID: 742753772}
+  mouseSensitivity: 0.1
+  walkSpeed: 8
+  sprintSpeed: 13
+  jumpHeight: 2
+  gravity: -30
+  coyoteTime: 0.12
+  jumpBufferTime: 0.12
+--- !u!143 &38877060
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38877052}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &205582418
 GameObject:
   m_ObjectHideFlags: 0
@@ -325,13 +360,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   enemyScript: {fileID: 1272617584}
-  fallSoundScript: {fileID: 0}
   shootClips:
   - {fileID: 8300000, guid: 3d7dab63ae8a36e4b944ccf9f22834a8, type: 3}
   reloadClips:
   - {fileID: 8300000, guid: 48bed25a2cb845e4799ad07c2242d92c, type: 3}
   fallClips:
-  - {fileID: 8300000, guid: dd14d8a7158115242848bc0df715df34, type: 3}
+  - {fileID: 8300000, guid: 3096b1b34bf67ae41af118e273fbc998, type: 3}
   deathClips:
   - {fileID: 8300000, guid: 6fd2a88331c81634aa531dbd301651ba, type: 3}
   - {fileID: 8300000, guid: e8cabb74aa9def74aa0e79143e646603, type: 3}
@@ -809,7 +843,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1534649791}
   m_Father: {fileID: 38877057}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &742753773
@@ -1117,6 +1152,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &868024111
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 742753772}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.08800006
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.62899995
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.26599997
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_Name
+      value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+      propertyPath: m_TagString
+      value: Pistol
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: -1510381904493913627, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
 --- !u!1 &1022996487
 GameObject:
   m_ObjectHideFlags: 0
@@ -1534,6 +1631,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   hp: 100
   bonusTime: 2
+--- !u!4 &1534649791 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 98ac8cf77b2da7241afd8ad2a728775c, type: 3}
+  m_PrefabInstance: {fileID: 868024111}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1728858129
 GameObject:
   m_ObjectHideFlags: 0
@@ -1679,7 +1781,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1780000738
 MonoBehaviour:
   m_ObjectHideFlags: 0

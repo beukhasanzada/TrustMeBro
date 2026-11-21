@@ -6,7 +6,6 @@ public class SoundManager : MonoBehaviour
     public static SoundManager Instance { get; private set; }
 
     [SerializeField] private Enemy enemyScript;
-    [SerializeField] private FallSound fallSoundScript;
 
     [Header("Audio")]
     public AudioClip[] shootClips;
@@ -57,6 +56,8 @@ public class SoundManager : MonoBehaviour
         {
             clip = clips[0];
         }
+
+        if (clips == shootClips) clip = clips[0];
 
         // Проигрывает звук в точке мира и сам удаляет временный объект
         AudioSource.PlayClipAtPoint(clip, position, volume);
