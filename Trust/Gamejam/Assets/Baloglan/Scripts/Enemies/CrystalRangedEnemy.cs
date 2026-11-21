@@ -163,33 +163,10 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
             && ObstaclesClear(eyes.position, point);
     }
 
-    Vector3 TargetAimPoint()
-    {
-        if (targetCollider == null)
-            return target.transform.position + Vector3.up;
+    Vector3 TargetAimPoint() => EnemySight.AimPoint(target, targetCollider);
 
-        Bounds bounds = targetCollider.bounds;
-        return bounds.center + Vector3.up * (bounds.extents.y * 0.24f);
-    }
-
-    bool ObstaclesClear(Vector3 origin, Vector3 point)
-    {
-        Vector3 delta = point - origin;
-        float distance = delta.magnitude;
-        if (distance < 0.001f)
-            return true;
-
-        int count = Physics.RaycastNonAlloc(origin, delta / distance, sightHits, distance, sightLayers,
-            QueryTriggerInteraction.Ignore);
-        for (int i = 0; i < count; i++)
-        {
-            Transform hit = sightHits[i].collider.transform;
-            if (!hit.IsChildOf(transform) && !hit.IsChildOf(target.transform))
-                return false;
-        }
-
-        return true;
-    }
+    bool ObstaclesClear(Vector3 origin, Vector3 point) =>
+        EnemySight.IsClear(transform, target.transform, origin, point, sightLayers, sightHits);
 
     void ChaseTarget()
     {
@@ -242,12 +219,8 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
         }
     }
 
-    bool IsFacing(Vector3 direction, float halfAngle)
-    {
-        direction.y = 0f;
-        return direction.sqrMagnitude < 0.0001f
-            || Vector3.Dot(transform.forward, direction.normalized) >= Mathf.Cos(halfAngle * Mathf.Deg2Rad);
-    }
+    bool IsFacing(Vector3 direction, float halfAngle) =>
+        EnemySight.IsFacing(transform.forward, direction, halfAngle);
 
     void SetAnimation(int state)
     {
