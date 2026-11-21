@@ -12,7 +12,8 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     [SerializeField] InputActionAsset inputActions;
     [SerializeField] Transform orientation;
     [SerializeField] LayerMask groundLayers = Physics.DefaultRaycastLayers;
-    [SerializeField] LayerMask wallrunLayers = Physics.DefaultRaycastLayers;
+
+    [SerializeField] private LayerMask wallrunLayers = Physics.DefaultRaycastLayers;
 
     [Header("Ground movement")]
     [SerializeField, Min(0f)] float walkSpeed = 9f;
@@ -59,6 +60,14 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     [SerializeField, Min(0f)] float wallJumpUp = 8.5f;
     [SerializeField, Min(0f)] float wallJumpAway = 8f;
 
+    [Header("Shotgun Blast Jump")]
+    public bool blastJumpEnabled = true;
+    public float blastMaxDistance = 4f;
+    public float blastForce = 18f;
+    public float blastHorizontalMultiplier = 0.6f;
+    public float blastDecay = 12f;
+    public LayerMask blastSurfaces = ~0;
+
     const float GroundProbeLift = 0.08f;
     const float GroundProbeDistance = 0.12f;
     const float ColliderSkin = 0.025f;
@@ -91,6 +100,8 @@ public sealed class RigidbodyFpsController : MonoBehaviour
     Collider previousWall;
     double wallrunUntil;
     double wallExclusionUntil;
+    Vector3 blastVelocity;
+    Vector3 appliedBlastVelocity;
 
     public Vector2 LookInput { get; private set; }
     public bool LookUsesGamepad { get; private set; }
@@ -198,6 +209,12 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         RechargeDash(now);
 
         Vector3 velocity = body.linearVelocity;
+        if (appliedBlastVelocity.sqrMagnitude > 0f)
+        {
+            Vector3 blastDir = appliedBlastVelocity.normalized;
+            float carried = Mathf.Clamp(Vector3.Dot(Horizontal(velocity), blastDir), 0f, appliedBlastVelocity.magnitude);
+            velocity -= blastDir * carried;
+        }
         Vector3 groundNormal = Vector3.up;
         IsGrounded = now >= ignoreGroundUntil && FindGround(velocity, out groundNormal);
         if (IsGrounded)
@@ -248,7 +265,65 @@ public sealed class RigidbodyFpsController : MonoBehaviour
             velocity = MoveInAir(velocity, wishDirection);
         }
 
-        body.linearVelocity = velocity;
+        blastVelocity = Vector3.MoveTowards(blastVelocity, Vector3.zero, blastDecay * Time.fixedDeltaTime);
+        appliedBlastVelocity = blastVelocity;
+        body.linearVelocity = velocity + blastVelocity;
+    }
+
+    public void TryBlastJump(Ray ray)
+    {
+        if (!blastJumpEnabled || body == null || blastMaxDistance <= 0f)
+            return;
+
+        int count = Physics.RaycastNonAlloc(ray.origin, ray.direction, surfaceHits, blastMaxDistance,
+            blastSurfaces, QueryTriggerInteraction.Ignore);
+        RaycastHit nearestHit = default;
+        float nearestDist = float.MaxValue;
+        bool found = false;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = surfaceHits[i];
+            if (hit.collider.attachedRigidbody == body || hit.collider.transform.IsChildOf(transform))
+                continue;
+            if (hit.distance < nearestDist)
+            {
+                nearestDist = hit.distance;
+                nearestHit = hit;
+                found = true;
+            }
+        }
+
+        if (!found || IsEnemyTransform(nearestHit.collider.transform))
+            return;
+
+        Vector3 push = (-ray.direction + nearestHit.normal).normalized;
+        float force = blastForce * Mathf.Lerp(0.4f, 1f, 1f - nearestHit.distance / blastMaxDistance);
+
+        if (push.y > 0f)
+        {
+            Vector3 v = body.linearVelocity;
+            v.y = Mathf.Max(v.y, push.y * force);
+            body.linearVelocity = v;
+
+            IsGrounded = IsSliding = false;
+            ignoreGroundUntil = Time.fixedTimeAsDouble + JumpGroundLock;
+            lastGroundedAt = jumpBufferedUntil = double.NegativeInfinity;
+            UpdateStance(false);
+        }
+
+        blastVelocity += new Vector3(push.x, 0f, push.z) * (force * blastHorizontalMultiplier);
+    }
+
+    static bool IsEnemyTransform(Transform t)
+    {
+        if (t == null) return false;
+        if (t.GetComponentInParent<IWeaponDamageable>() != null) return true;
+        while (t != null)
+        {
+            if (t.CompareTag("Enemy")) return true;
+            t = t.parent;
+        }
+        return false;
     }
 
     Vector3 MoveOnGround(Vector3 velocity, Vector3 normal, Vector3 wish)
@@ -327,6 +402,7 @@ public sealed class RigidbodyFpsController : MonoBehaviour
         FinishJump(now);
         return horizontal + Vector3.up * Mathf.Max(jumpSpeed, velocity.y);
     }
+    
 
     void FinishJump(double now)
     {

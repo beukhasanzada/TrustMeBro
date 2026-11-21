@@ -55,6 +55,7 @@ public sealed class WeaponController : MonoBehaviour
     [SerializeField] LayerMask hitLayers = Physics.DefaultRaycastLayers;
     [SerializeField] WeaponDefinition[] loadout = Array.Empty<WeaponDefinition>();
     [SerializeField] bool requireLockedCursorForMouse = true;
+    [SerializeField] float fireIntervalMultiplier = 1f;
 
     readonly RaycastHit[] hits = new RaycastHit[32];
     readonly WeaponItem[] slots = new WeaponItem[InventoryCapacity];
@@ -62,6 +63,7 @@ public sealed class WeaponController : MonoBehaviour
     GameObject activeViewModel;
     WeaponViewAnimator viewAnimator;
     FpsCameraRig cameraRig;
+    RigidbodyFpsController fpsController;
     Vector3 mountRestPosition;
     Quaternion mountRestRotation;
     Vector2 recoilTarget;
@@ -97,6 +99,7 @@ public sealed class WeaponController : MonoBehaviour
         }
 
         cameraRig = aim.GetComponentInParent<FpsCameraRig>();
+        fpsController = GetComponentInParent<RigidbodyFpsController>() ?? FindFirstObjectByType<RigidbodyFpsController>();
         mountRestPosition = viewModelMount.localPosition;
         mountRestRotation = viewModelMount.localRotation;
 
@@ -350,7 +353,8 @@ public sealed class WeaponController : MonoBehaviour
 
         WeaponDefinition definition = equipped.Definition;
         equipped.Magazine--;
-        equipped.NextShotAt = now + definition.ShotInterval;
+        
+        equipped.NextShotAt = now + definition.ShotInterval * fireIntervalMultiplier;
         PlaySfx(definition.ShootSfx);
         viewAnimator?.PlayFire();
 
@@ -363,6 +367,9 @@ public sealed class WeaponController : MonoBehaviour
             Vector3 direction = rotation * new Vector3(offset.x, offset.y, 1f).normalized;
             ApplyHit(origin, direction, definition);
         }
+
+        if (definition.Type == WeaponType.Shotgun && fpsController != null)
+            fpsController.TryBlastJump(new Ray(origin, aim.forward));
 
         // This kick affects the rendered aim from the next frame onward.
         float maxStack = definition.Recoil.maxStack;
