@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TripleShotgun
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Triple-Barrel Shotgun
+  weaponType: 2
   viewModel: {fileID: 2095925414478935827, guid: ca42cd7cb27de194981af208430321f3, type: 3}
   pickupPrefab: {fileID: 2408077191949057883, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
   fireMode: 0

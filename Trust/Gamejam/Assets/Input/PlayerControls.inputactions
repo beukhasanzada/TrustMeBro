@@ -44,7 +44,10 @@
                 { "name": "Fire", "type": "Button", "id": "ac1aa8cd-0481-4d28-b356-bf345fadb730", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "Reload", "type": "Button", "id": "71b03531-5fbf-418b-9079-c9a2fde30b4d", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "NextWeapon", "type": "Button", "id": "da1f7a33-2930-47ed-9b82-3f4107c420fa", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
-                { "name": "DropWeapon", "type": "Button", "id": "b3f0a647-9d54-4016-b9e9-aaf3df292ec7", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+                { "name": "DropWeapon", "type": "Button", "id": "b3f0a647-9d54-4016-b9e9-aaf3df292ec7", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "SelectPistol", "type": "Button", "id": "c6999313-df98-4bd9-99e7-412e28e70576", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "SelectShotgun", "type": "Button", "id": "5785150d-f8ac-42c6-af69-7b2e17e18b91", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "SelectSmg", "type": "Button", "id": "01c090d6-ae5c-4b7f-8963-57ea2a5440c0", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
             ],
             "bindings": [
                 { "name": "", "id": "9042f6f0-a3d3-4e25-a8ab-89a45e3afcc9", "path": "<Mouse>/leftButton", "groups": "Keyboard&Mouse", "action": "Fire" },
@@ -54,7 +57,13 @@
                 { "name": "", "id": "cfdc3cba-166c-43bd-b3fc-e473cc120058", "path": "<Keyboard>/tab", "groups": "Keyboard&Mouse", "action": "NextWeapon" },
                 { "name": "", "id": "08410c32-ccb6-415a-b014-2ce543606f42", "path": "<Gamepad>/dpad/right", "groups": "Gamepad", "action": "NextWeapon" },
                 { "name": "", "id": "4ee75d83-ea23-4b67-b008-cb5ec6072dd6", "path": "<Keyboard>/g", "groups": "Keyboard&Mouse", "action": "DropWeapon" },
-                { "name": "", "id": "6c20ebd1-3b2d-47a1-b932-a5601cbc9e71", "path": "<Gamepad>/dpad/down", "groups": "Gamepad", "action": "DropWeapon" }
+                { "name": "", "id": "6c20ebd1-3b2d-47a1-b932-a5601cbc9e71", "path": "<Gamepad>/dpad/down", "groups": "Gamepad", "action": "DropWeapon" },
+                { "name": "", "id": "11de0b97-abee-4f95-9af4-cba383ebe98c", "path": "<Keyboard>/1", "groups": "Keyboard&Mouse", "action": "SelectPistol" },
+                { "name": "", "id": "98484666-be84-4f44-9571-43a6b53def57", "path": "<Keyboard>/2", "groups": "Keyboard&Mouse", "action": "SelectShotgun" },
+                { "name": "", "id": "75a1d6fe-3c01-4b8a-a3d3-b3d39ef6458d", "path": "<Keyboard>/3", "groups": "Keyboard&Mouse", "action": "SelectSmg" },
+                { "name": "", "id": "82f03d63-91c2-4220-989f-29205791294a", "path": "<Keyboard>/numpad1", "groups": "Keyboard&Mouse", "action": "SelectPistol" },
+                { "name": "", "id": "41eafa7e-ad4c-44e8-acad-96d51c379512", "path": "<Keyboard>/numpad2", "groups": "Keyboard&Mouse", "action": "SelectShotgun" },
+                { "name": "", "id": "55a02767-7b34-4e4e-a8fa-1c9b3a5c390b", "path": "<Keyboard>/numpad3", "groups": "Keyboard&Mouse", "action": "SelectSmg" }
             ]
         }
     ],

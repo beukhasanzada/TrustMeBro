@@ -76,6 +76,7 @@ public sealed class WeaponController : MonoBehaviour
     bool cursorWasLocked;
     bool waitingForFireRelease;
     bool dropRequested;
+    WeaponType requestedWeaponType;
 
     public int EquippedIndex { get; private set; } = -1;
     public int WeaponCount { get; private set; }
@@ -121,9 +122,12 @@ public sealed class WeaponController : MonoBehaviour
 
     void OnEnable()
     {
-        if (dropWeapon != null)
-            dropWeapon.performed += RequestDrop;
-        weaponInput?.Enable();
+        if (weaponInput != null)
+        {
+            weaponInput.actionTriggered += HandleWeaponCommand;
+            weaponInput.Enable();
+        }
+
         cursorWasLocked = Cursor.lockState == CursorLockMode.Locked;
     }
 
@@ -135,10 +139,14 @@ public sealed class WeaponController : MonoBehaviour
 
     void OnDisable()
     {
-        if (dropWeapon != null)
-            dropWeapon.performed -= RequestDrop;
-        weaponInput?.Disable();
+        if (weaponInput != null)
+        {
+            weaponInput.actionTriggered -= HandleWeaponCommand;
+            weaponInput.Disable();
+        }
+
         dropRequested = false;
+        requestedWeaponType = WeaponType.Unspecified;
         waitingForFireRelease = false;
         ResetRecoil();
         if (CancelReload())
@@ -166,13 +174,17 @@ public sealed class WeaponController : MonoBehaviour
     {
         CompleteReload();
 
+        WeaponType selection = requestedWeaponType;
+        requestedWeaponType = WeaponType.Unspecified;
         if (dropRequested)
         {
             dropRequested = false;
             if (TryDropEquipped())
                 return;
         }
-        if (nextWeapon.WasPressedThisFrame())
+        if (selection != WeaponType.Unspecified)
+            EquipWeaponType(selection);
+        else if (nextWeapon.WasPressedThisFrame())
             EquipNext();
         if (reload.WasPressedThisFrame())
             TryReload();
@@ -246,7 +258,40 @@ public sealed class WeaponController : MonoBehaviour
         SetEquipped(index);
     }
 
-    void RequestDrop(InputAction.CallbackContext _) => dropRequested = true;
+    void HandleWeaponCommand(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        if (context.action == dropWeapon)
+        {
+            dropRequested = true;
+            return;
+        }
+
+        requestedWeaponType = context.action.name switch
+        {
+            "SelectPistol" => WeaponType.Pistol,
+            "SelectShotgun" => WeaponType.Shotgun,
+            "SelectSmg" => WeaponType.Smg,
+            _ => requestedWeaponType
+        };
+    }
+
+    void EquipWeaponType(WeaponType type)
+    {
+        if (equipped?.Definition.Type == type)
+            return;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i]?.Definition.Type == type)
+            {
+                Equip(i);
+                return;
+            }
+        }
+    }
 
     public bool TryDropEquipped()
     {

@@ -6,6 +6,14 @@ public enum WeaponFireMode
     Automatic
 }
 
+public enum WeaponType
+{
+    Unspecified,
+    Pistol,
+    Shotgun,
+    Smg
+}
+
 [System.Serializable]
 public struct WeaponRecoilSettings
 {
@@ -23,6 +31,7 @@ public struct WeaponRecoilSettings
 public sealed class WeaponDefinition : ScriptableObject
 {
     [SerializeField] string displayName;
+    [SerializeField] WeaponType weaponType;
     [SerializeField] GameObject viewModel;
     [SerializeField] WeaponPickup pickupPrefab;
     [SerializeField] WeaponFireMode fireMode;
@@ -49,6 +58,7 @@ public sealed class WeaponDefinition : ScriptableObject
     };
 
     public string DisplayName => string.IsNullOrEmpty(displayName) ? name : displayName;
+    public WeaponType Type => weaponType;
     public GameObject ViewModel => viewModel;
     public WeaponPickup PickupPrefab => pickupPrefab;
     public WeaponFireMode FireMode => fireMode;
