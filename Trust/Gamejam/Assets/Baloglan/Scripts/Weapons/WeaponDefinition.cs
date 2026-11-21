@@ -24,6 +24,7 @@ public sealed class WeaponDefinition : ScriptableObject
 {
     [SerializeField] string displayName;
     [SerializeField] GameObject viewModel;
+    [SerializeField] WeaponPickup pickupPrefab;
     [SerializeField] WeaponFireMode fireMode;
     [SerializeField, Min(1f)] float roundsPerMinute = 360f;
     [SerializeField, Min(0f)] float damagePerPellet = 25f;
@@ -49,6 +50,7 @@ public sealed class WeaponDefinition : ScriptableObject
 
     public string DisplayName => string.IsNullOrEmpty(displayName) ? name : displayName;
     public GameObject ViewModel => viewModel;
+    public WeaponPickup PickupPrefab => pickupPrefab;
     public WeaponFireMode FireMode => fireMode;
     public float ShotInterval => 60f / roundsPerMinute;
     public float DamagePerPellet => damagePerPellet;

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04225b48ced140e9ac66ad6fc3e18160, type: 3}
+  m_Name: PPSH
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: PPSH SMG
+  viewModel: {fileID: 2809195756366074535, guid: b31a647afec05664685cfea25b32d5f0, type: 3}
+  pickupPrefab: {fileID: 246484649752700410, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+  fireMode: 1
+  roundsPerMinute: 780
+  damagePerPellet: 15
+  pelletsPerShot: 1
+  spreadDegrees: 1.25
+  range: 65
+  magazineCapacity: 30
+  startingReserve: 90
+  reloadSeconds: 1.9666668
+  shootSfx: {fileID: 8300000, guid: f40b4cc79d2017e4bbd90562f344ee35, type: 3}
+  reloadSfx: {fileID: 8300000, guid: 948190f0eeabaaf42a5984da64f21e8e, type: 3}
+  recoil:
+    cameraPitch: 0.85
+    cameraYaw: 0.45
+    viewModelPitch: 2.6
+    viewModelRoll: 1.2
+    kickbackDistance: 0.028
+    kickSpeed: 44
+    returnSpeed: 13
+    maxStack: 3

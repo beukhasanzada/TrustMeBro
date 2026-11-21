@@ -43,7 +43,8 @@
             "actions": [
                 { "name": "Fire", "type": "Button", "id": "ac1aa8cd-0481-4d28-b356-bf345fadb730", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "Reload", "type": "Button", "id": "71b03531-5fbf-418b-9079-c9a2fde30b4d", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
-                { "name": "NextWeapon", "type": "Button", "id": "da1f7a33-2930-47ed-9b82-3f4107c420fa", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+                { "name": "NextWeapon", "type": "Button", "id": "da1f7a33-2930-47ed-9b82-3f4107c420fa", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "DropWeapon", "type": "Button", "id": "b3f0a647-9d54-4016-b9e9-aaf3df292ec7", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
             ],
             "bindings": [
                 { "name": "", "id": "9042f6f0-a3d3-4e25-a8ab-89a45e3afcc9", "path": "<Mouse>/leftButton", "groups": "Keyboard&Mouse", "action": "Fire" },
@@ -51,7 +52,9 @@
                 { "name": "", "id": "6b0fa826-f502-4a74-8a0e-66c910452a64", "path": "<Keyboard>/r", "groups": "Keyboard&Mouse", "action": "Reload" },
                 { "name": "", "id": "2ebbcdf1-b615-4c6e-b7d8-ebf1915a1803", "path": "<Gamepad>/buttonWest", "groups": "Gamepad", "action": "Reload" },
                 { "name": "", "id": "cfdc3cba-166c-43bd-b3fc-e473cc120058", "path": "<Keyboard>/tab", "groups": "Keyboard&Mouse", "action": "NextWeapon" },
-                { "name": "", "id": "08410c32-ccb6-415a-b014-2ce543606f42", "path": "<Gamepad>/dpad/right", "groups": "Gamepad", "action": "NextWeapon" }
+                { "name": "", "id": "08410c32-ccb6-415a-b014-2ce543606f42", "path": "<Gamepad>/dpad/right", "groups": "Gamepad", "action": "NextWeapon" },
+                { "name": "", "id": "4ee75d83-ea23-4b67-b008-cb5ec6072dd6", "path": "<Keyboard>/g", "groups": "Keyboard&Mouse", "action": "DropWeapon" },
+                { "name": "", "id": "6c20ebd1-3b2d-47a1-b932-a5601cbc9e71", "path": "<Gamepad>/dpad/down", "groups": "Gamepad", "action": "DropWeapon" }
             ]
         }
     ],

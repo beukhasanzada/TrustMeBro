@@ -873,6 +873,63 @@ MonoBehaviour:
   wallrunGravity: 5
   wallJumpUp: 8.5
   wallJumpAway: 8
+--- !u!1001 &914512343
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5902726940082214943, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6385817282641565012, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
+      propertyPath: m_Name
+      value: TripleShotgun Ground Pickup
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 26b23ebf0cd92cd41ace7d223ea4b6e2, type: 3}
 --- !u!1 &932519036
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,6 +992,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 84265604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1186680881
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1428744414344832111, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9100375864593795550, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
+      propertyPath: m_Name
+      value: Pistol Ground Pickup
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
 --- !u!1 &1281851448
 GameObject:
   m_ObjectHideFlags: 0
@@ -1048,6 +1162,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1297489458
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.40557978
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5792279
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644392402263195311, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4112897965090560635, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
+      propertyPath: m_Name
+      value: PPSH Ground Pickup
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c07a90ec9b306054c8e1feeb729eb7a9, type: 3}
 --- !u!1 &1359241932
 GameObject:
   m_ObjectHideFlags: 0
@@ -1316,9 +1487,8 @@ MonoBehaviour:
   viewModelMount: {fileID: 975584114}
   hitLayers:
     serializedVersion: 2
-    m_Bits: 4294967291
-  loadout:
-  - {fileID: 11400000, guid: 55b88b4f2eaf12245a6e94568efafd53, type: 2}
+    m_Bits: 123
+  loadout: []
   requireLockedCursorForMouse: 1
 --- !u!82 &1454348509
 AudioSource:
@@ -1555,3 +1725,6 @@ SceneRoots:
   - {fileID: 190002001}
   - {fileID: 190003001}
   - {fileID: 100173566}
+  - {fileID: 1186680881}
+  - {fileID: 1297489458}
+  - {fileID: 914512343}

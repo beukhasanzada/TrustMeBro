@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Pistol
   viewModel: {fileID: 3176495645511840500, guid: 902a68fc5e02fa442b0d348a21d2de5a, type: 3}
+  pickupPrefab: {fileID: 57778005211691504, guid: 87981077e7ec41c48b395d390bb05cf4, type: 3}
   fireMode: 0
   roundsPerMinute: 360
   damagePerPellet: 25

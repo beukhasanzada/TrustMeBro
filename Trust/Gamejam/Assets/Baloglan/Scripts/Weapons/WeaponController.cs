@@ -24,11 +24,31 @@ public readonly struct WeaponAmmoState
     }
 }
 
+// Transfer the same runtime item between the inventory and the world.
+internal sealed class WeaponItem
+{
+    public readonly WeaponDefinition Definition;
+    public int Magazine;
+    public int Reserve;
+    public double NextShotAt;
+
+    public WeaponItem(WeaponDefinition definition)
+    {
+        Definition = definition;
+        Magazine = definition.MagazineCapacity;
+        Reserve = definition.StartingReserve;
+    }
+}
+
 [DefaultExecutionOrder(120)]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(AudioSource))]
 public sealed class WeaponController : MonoBehaviour
 {
+    public const int InventoryCapacity = 3;
+    const float DropSpawnDistance = 1.55f;
+    const float DropThrowSpeed = 3f;
+
     [SerializeField] InputActionAsset inputActions;
     [SerializeField] Transform aim;
     [SerializeField] Transform viewModelMount;
@@ -36,25 +56,9 @@ public sealed class WeaponController : MonoBehaviour
     [SerializeField] WeaponDefinition[] loadout = Array.Empty<WeaponDefinition>();
     [SerializeField] bool requireLockedCursorForMouse = true;
 
-    // Mutable ammo and cooldown belong to this copy of the weapon, never to its shared asset.
-    sealed class WeaponSlot
-    {
-        public readonly WeaponDefinition Definition;
-        public int Magazine;
-        public int Reserve;
-        public double NextShotAt;
-
-        public WeaponSlot(WeaponDefinition definition)
-        {
-            Definition = definition;
-            Magazine = definition.MagazineCapacity;
-            Reserve = definition.StartingReserve;
-        }
-    }
-
     readonly RaycastHit[] hits = new RaycastHit[32];
-    WeaponSlot[] slots;
-    WeaponSlot equipped;
+    readonly WeaponItem[] slots = new WeaponItem[InventoryCapacity];
+    WeaponItem equipped;
     GameObject activeViewModel;
     WeaponViewAnimator viewAnimator;
     FpsCameraRig cameraRig;
@@ -67,11 +71,14 @@ public sealed class WeaponController : MonoBehaviour
     InputAction fire;
     InputAction reload;
     InputAction nextWeapon;
+    InputAction dropWeapon;
     double reloadCompleteAt = -1d;
     bool cursorWasLocked;
     bool waitingForFireRelease;
+    bool dropRequested;
 
     public int EquippedIndex { get; private set; } = -1;
+    public int WeaponCount { get; private set; }
     public WeaponAmmoState Ammo => equipped == null ? default
         : new WeaponAmmoState(equipped.Definition, equipped.Magazine, equipped.Reserve, reloadCompleteAt >= 0d);
     public event Action<WeaponAmmoState> AmmoChanged;
@@ -90,21 +97,32 @@ public sealed class WeaponController : MonoBehaviour
         mountRestPosition = viewModelMount.localPosition;
         mountRestRotation = viewModelMount.localRotation;
 
-        slots = new WeaponSlot[loadout.Length];
-        for (int i = 0; i < loadout.Length; i++)
+        for (int i = 0; i < Mathf.Min(loadout.Length, InventoryCapacity); i++)
         {
-            if (loadout[i] != null)
-                slots[i] = new WeaponSlot(loadout[i]);
+            if (loadout[i] == null)
+                continue;
+
+            slots[i] = new WeaponItem(loadout[i]);
+            WeaponCount++;
         }
 
         weaponInput = inputActions.FindActionMap("Weapons", throwIfNotFound: true).Clone();
         fire = weaponInput.FindAction("Fire", throwIfNotFound: true);
         reload = weaponInput.FindAction("Reload", throwIfNotFound: true);
         nextWeapon = weaponInput.FindAction("NextWeapon", throwIfNotFound: true);
+        dropWeapon = weaponInput.FindAction("DropWeapon");
+        if (dropWeapon == null)
+        {
+            dropWeapon = weaponInput.AddAction("DropWeapon", InputActionType.Button);
+            dropWeapon.AddBinding("<Keyboard>/g");
+            dropWeapon.AddBinding("<Gamepad>/dpad/down");
+        }
     }
 
     void OnEnable()
     {
+        if (dropWeapon != null)
+            dropWeapon.performed += RequestDrop;
         weaponInput?.Enable();
         cursorWasLocked = Cursor.lockState == CursorLockMode.Locked;
     }
@@ -117,7 +135,10 @@ public sealed class WeaponController : MonoBehaviour
 
     void OnDisable()
     {
+        if (dropWeapon != null)
+            dropWeapon.performed -= RequestDrop;
         weaponInput?.Disable();
+        dropRequested = false;
         waitingForFireRelease = false;
         ResetRecoil();
         if (CancelReload())
@@ -145,6 +166,12 @@ public sealed class WeaponController : MonoBehaviour
     {
         CompleteReload();
 
+        if (dropRequested)
+        {
+            dropRequested = false;
+            if (TryDropEquipped())
+                return;
+        }
         if (nextWeapon.WasPressedThisFrame())
             EquipNext();
         if (reload.WasPressedThisFrame())
@@ -168,33 +195,103 @@ public sealed class WeaponController : MonoBehaviour
 
     public bool Equip(int index)
     {
-        if (slots == null || index < 0 || index >= slots.Length || slots[index] == null || index == EquippedIndex)
+        if (index < 0 || index >= slots.Length || slots[index] == null || index == EquippedIndex)
             return false;
 
+        SetEquipped(index);
+        return true;
+    }
+
+    void SetEquipped(int index)
+    {
         CancelReload();
         ResetRecoil();
         EquippedIndex = index;
-        equipped = slots[index];
+        equipped = index >= 0 ? slots[index] : null;
         if (activeViewModel != null)
         {
             activeViewModel.SetActive(false);
             Destroy(activeViewModel);
         }
 
-        GameObject prefab = equipped.Definition.ViewModel;
+        GameObject prefab = equipped != null ? equipped.Definition.ViewModel : null;
         activeViewModel = prefab != null ? Instantiate(prefab, viewModelMount, false) : null;
         viewAnimator = activeViewModel != null ? activeViewModel.GetComponentInChildren<WeaponViewAnimator>() : null;
         PublishAmmo();
-        return true;
     }
 
-    void EquipNext()
+    bool EquipNext()
     {
         for (int offset = 1; offset <= slots.Length; offset++)
         {
             if (Equip((EquippedIndex + offset) % slots.Length))
-                return;
+                return true;
         }
+
+        return false;
+    }
+
+    internal void TryPickUp(WeaponPickup pickup)
+    {
+        if (!isActiveAndEnabled || WeaponCount == InventoryCapacity)
+            return;
+
+        int index = Array.IndexOf(slots, null);
+        WeaponItem item = pickup.Take();
+        if (item == null)
+            return;
+
+        slots[index] = item;
+        WeaponCount++;
+        SetEquipped(index);
+    }
+
+    void RequestDrop(InputAction.CallbackContext _) => dropRequested = true;
+
+    public bool TryDropEquipped()
+    {
+        if (!isActiveAndEnabled || equipped == null)
+            return false;
+
+        WeaponPickup prefab = equipped.Definition.PickupPrefab;
+        if (prefab == null)
+        {
+            Debug.LogWarning($"{equipped.Definition.DisplayName} needs a pickup prefab for dropping.", equipped.Definition);
+            return false;
+        }
+
+        Vector3 forward = Vector3.ProjectOnPlane(aim.forward, Vector3.up).normalized;
+        if (forward == Vector3.zero)
+            forward = transform.forward;
+
+        Vector3 origin = Vector3.Lerp(transform.position, aim.position, 0.55f);
+        float distance = GetDropDistance(origin, forward, prefab.HalfLength);
+        Quaternion rotation = Quaternion.LookRotation(forward) * Quaternion.Euler(0f, 0f, 90f);
+        WeaponPickup pickup = Instantiate(prefab, origin + forward * distance, rotation);
+        float throwSpeed = DropThrowSpeed * (distance / DropSpawnDistance);
+        pickup.InitializeDrop(equipped, this, forward * throwSpeed + Vector3.up * 0.55f);
+
+        slots[EquippedIndex] = null;
+        WeaponCount--;
+        if (!EquipNext())
+            SetEquipped(-1);
+        return true;
+    }
+
+    float GetDropDistance(Vector3 origin, Vector3 forward, float halfLength)
+    {
+        const float clearance = 0.08f;
+        float distance = DropSpawnDistance;
+        int count = Physics.SphereCastNonAlloc(origin, clearance, forward, hits, DropSpawnDistance + halfLength,
+            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = hits[i];
+            if (!hit.collider.transform.IsChildOf(transform))
+                distance = Mathf.Min(distance, Mathf.Max(0f, hit.distance - halfLength));
+        }
+
+        return distance;
     }
 
     public bool TryFire()
