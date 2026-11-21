@@ -13,7 +13,7 @@ public sealed class CrystalTurret : MonoBehaviour
     [Header("Detection")]
     [SerializeField] Health target;
     [SerializeField, Min(0.1f)] float detectionRange = 36f;
-    [SerializeField, Range(1f, 360f)] float fieldOfView = 150f;
+    [SerializeField, Range(1f, 360f)] float fieldOfView = 360f;
     [SerializeField] LayerMask sightLayers = Physics.DefaultRaycastLayers;
 
     [Header("Attack")]
@@ -37,7 +37,7 @@ public sealed class CrystalTurret : MonoBehaviour
     Collider targetCollider;
     MaterialPropertyBlock barrelProperties;
     Quaternion animatedBarrelRotation;
-    Vector3 aimDirection;
+    Quaternion aimRotation;
     float nextAttackAt;
     float flashUntil;
     bool aimApplied;
@@ -56,7 +56,7 @@ public sealed class CrystalTurret : MonoBehaviour
         }
 
         barrelProperties = new MaterialPropertyBlock();
-        aimDirection = muzzle.forward;
+        aimRotation = muzzle.rotation;
     }
 
     void Start()
@@ -73,13 +73,14 @@ public sealed class CrystalTurret : MonoBehaviour
     void LateUpdate()
     {
         bool visible = CanSeeTarget(out Vector3 point);
-        Vector3 desired = visible ? point - muzzle.position : muzzle.forward;
-        if (desired.sqrMagnitude > 0.0001f)
-            aimDirection = Vector3.RotateTowards(aimDirection, desired.normalized,
-                turnSpeed * Mathf.Deg2Rad * Time.deltaTime, 0f);
+        Vector3 direction = point - muzzle.position;
+        Quaternion desired = visible && direction.sqrMagnitude > 0.0001f
+            ? Quaternion.LookRotation(direction, transform.up)
+            : muzzle.rotation;
+        aimRotation = Quaternion.RotateTowards(aimRotation, desired, turnSpeed * Time.deltaTime);
 
         animatedBarrelRotation = barrel.localRotation;
-        barrel.rotation = Quaternion.FromToRotation(muzzle.forward, aimDirection) * barrel.rotation;
+        barrel.rotation = aimRotation * Quaternion.Inverse(muzzle.rotation) * barrel.rotation;
         aimApplied = true;
 
         bool inRange = visible && (point - barrel.position).sqrMagnitude <= attackRange * attackRange
@@ -131,7 +132,7 @@ public sealed class CrystalTurret : MonoBehaviour
         point = EnemySight.AimPoint(target, targetCollider);
         Vector3 direction = point - barrel.position;
         return direction.sqrMagnitude <= detectionRange * detectionRange
-            && EnemySight.IsFacing(transform.forward, direction, fieldOfView * 0.5f)
+            && (fieldOfView >= 360f || EnemySight.IsFacing(transform.forward, direction, fieldOfView * 0.5f))
             && HasClearShot(barrel.position, point);
     }
 

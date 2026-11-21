@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1672864747997816396}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Laser Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4383866295339082058}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,9 +185,9 @@ GameObject:
   - component: {fileID: 8910144519968177774}
   - component: {fileID: 7343054520771181335}
   - component: {fileID: 4816699948571278740}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: RangedCrystal
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -268,10 +268,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CrystalRangedEnemy
   target: {fileID: 0}
   detectionRange: 25
-  fieldOfView: 150
+  fieldOfView: 360
   sightLayers:
     serializedVersion: 2
-    m_Bits: 4294967291
+    m_Bits: 251
   attackRange: 20
   attackCooldown: 0.9
   damage: 12
@@ -580,6 +580,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8903809425727896564}
     m_Modifications:
+    - target: {fileID: -9095392677220099969, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.48263136
@@ -632,6 +636,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -8320884244370684582, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
@@ -648,6 +656,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: rangedCrystal
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1740119194765387563, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072793469315211902, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585806439175357232, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5649378242224946465, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
       propertyPath: m_Controller
       value: 
@@ -659,6 +687,18 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5936101824537587582, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6702846280863672229, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7766740400829385512, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8175974999401292755, guid: e0a65e77294bbb144b1e71a5a511ef43, type: 3}
       propertyPath: m_LocalPosition.x

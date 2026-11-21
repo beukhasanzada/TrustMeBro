@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1049543890437072360}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Laser Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,9 +44,9 @@ GameObject:
   - component: {fileID: 486912763720105899}
   - component: {fileID: 6215854389886681509}
   - component: {fileID: 8976473240394113092}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CrystalTurret
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CrystalTurret
   target: {fileID: 0}
   detectionRange: 36
-  fieldOfView: 150
+  fieldOfView: 360
   sightLayers:
     serializedVersion: 2
     m_Bits: 251
@@ -308,6 +308,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3293336427984311689, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -1890515458591707199, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -999004555503157537, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -572092846154385442, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -246518443240561724, guid: d077b77ee00cf25419457d16884294fa, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -331,6 +347,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d077b77ee00cf25419457d16884294fa, type: 3}
       propertyPath: m_Name
       value: turret
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8212999133974957281, guid: d077b77ee00cf25419457d16884294fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

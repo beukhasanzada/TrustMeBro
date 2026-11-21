@@ -14,7 +14,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
     [Header("Detection")]
     [SerializeField] Health target;
     [SerializeField, Min(0.1f)] float detectionRange = 25f;
-    [SerializeField, Range(1f, 360f)] float fieldOfView = 150f;
+    [SerializeField, Range(1f, 360f)] float fieldOfView = 360f;
     [SerializeField] LayerMask sightLayers = Physics.DefaultRaycastLayers;
 
     [Header("Attack")]
@@ -159,7 +159,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
         point = TargetAimPoint();
         Vector3 direction = point - eyes.position;
         return direction.sqrMagnitude <= detectionRange * detectionRange
-            && IsFacing(direction, fieldOfView * 0.5f)
+            && (fieldOfView >= 360f || IsFacing(direction, fieldOfView * 0.5f))
             && ObstaclesClear(eyes.position, point);
     }
 
