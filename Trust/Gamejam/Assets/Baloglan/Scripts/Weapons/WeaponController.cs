@@ -79,7 +79,7 @@ public sealed class WeaponController : MonoBehaviour
     bool cursorWasLocked;
     bool waitingForFireRelease;
     bool dropRequested;
-    WeaponType requestedWeaponType;
+    int requestedSlot = -1;
     int enemyHitboxLayer;
 
     public int EquippedIndex { get; private set; } = -1;
@@ -154,7 +154,7 @@ public sealed class WeaponController : MonoBehaviour
         }
 
         dropRequested = false;
-        requestedWeaponType = WeaponType.Unspecified;
+        requestedSlot = -1;
         waitingForFireRelease = false;
         ResetRecoil();
         if (CancelReload())
@@ -182,16 +182,16 @@ public sealed class WeaponController : MonoBehaviour
     {
         CompleteReload();
 
-        WeaponType selection = requestedWeaponType;
-        requestedWeaponType = WeaponType.Unspecified;
+        int selection = requestedSlot;
+        requestedSlot = -1;
         if (dropRequested)
         {
             dropRequested = false;
             if (TryDropEquipped())
                 return;
         }
-        if (selection != WeaponType.Unspecified)
-            EquipWeaponType(selection);
+        if (selection >= 0)
+            Equip(selection);
         else if (nextWeapon.WasPressedThisFrame())
             EquipNext();
         if (reload.WasPressedThisFrame())
@@ -263,11 +263,18 @@ public sealed class WeaponController : MonoBehaviour
         if (!isActiveAndEnabled || WeaponCount == InventoryCapacity)
             return;
 
-        int index = Array.IndexOf(slots, null);
         WeaponItem item = pickup.Take();
         if (item == null)
             return;
 
+        int preferredSlot = item.Definition.Type switch
+        {
+            WeaponType.Pistol => 0,
+            WeaponType.Shotgun => 1,
+            WeaponType.Smg or WeaponType.AssaultRifle => 2,
+            _ => -1
+        };
+        int index = preferredSlot >= 0 && slots[preferredSlot] == null ? preferredSlot : Array.IndexOf(slots, null);
         slots[index] = item;
         WeaponCount++;
         SetEquipped(index);
@@ -284,28 +291,13 @@ public sealed class WeaponController : MonoBehaviour
             return;
         }
 
-        requestedWeaponType = context.action.name switch
+        requestedSlot = context.action.name switch
         {
-            "SelectPistol" => WeaponType.Pistol,
-            "SelectShotgun" => WeaponType.Shotgun,
-            "SelectSmg" => WeaponType.Smg,
-            _ => requestedWeaponType
+            "SelectSlot1" => 0,
+            "SelectSlot2" => 1,
+            "SelectSlot3" => 2,
+            _ => requestedSlot
         };
-    }
-
-    void EquipWeaponType(WeaponType type)
-    {
-        if (equipped?.Definition.Type == type)
-            return;
-
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (slots[i]?.Definition.Type == type)
-            {
-                Equip(i);
-                return;
-            }
-        }
     }
 
     public bool TryDropEquipped()
@@ -442,7 +434,7 @@ public sealed class WeaponController : MonoBehaviour
         viewModelMount.SetLocalPositionAndRotation(mountRestPosition + kickback, mountRestRotation * kickRotation);
     }
 
-    void ResetRecoil()
+    internal void ResetRecoil()
     {
         if (recoilTarget == Vector2.zero && recoilOffset == Vector2.zero)
             return;

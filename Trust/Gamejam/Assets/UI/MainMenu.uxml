@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/RetroChrome.uss"/>
+    <Style src="project://database/Assets/UI/MainMenu.uss"/>
+    <ui:VisualElement class="menu-screen">
+        <ui:VisualElement class="menu-window retro-frame">
+            <ui:VisualElement class="retro-titlebar menu-titlebar">
+                <ui:VisualElement class="retro-app-icon"/>
+                <ui:Label text="Office Chaos" class="retro-title"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="menu-body">
+                <ui:Label text="OFFICE" class="menu-wordmark"/>
+                <ui:Label text="CHAOS" class="menu-wordmark menu-wordmark--blue"/>
+                <ui:VisualElement class="menu-actions">
+                    <ui:Button name="play-button" text="Start game" class="menu-button retro-button retro-button--primary"/>
+                    <ui:Button name="tutorial-button" text="Tutorial" class="menu-button retro-button"/>
+                    <ui:Button name="quit-button" text="Quit" class="menu-button menu-button--quit retro-button"/>
+                </ui:VisualElement>
+                <ui:Label name="menu-status" class="menu-status"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -20,6 +20,15 @@ public class PortalTrigger : MonoBehaviour
     public void TriggerPortal()
     {
         if (triggered) return;
+
+        if (string.IsNullOrWhiteSpace(targetScene) || string.IsNullOrWhiteSpace(loadingSceneName)
+            || targetScene == loadingSceneName || !Application.CanStreamedLevelBeLoaded(targetScene)
+            || !Application.CanStreamedLevelBeLoaded(loadingSceneName))
+        {
+            Debug.LogWarning($"Portal requires a valid destination and loading scene. Destination '{targetScene}', loading scene '{loadingSceneName}'.", this);
+            return;
+        }
+
         triggered = true;
 
         LoadingData.nextScene = targetScene;

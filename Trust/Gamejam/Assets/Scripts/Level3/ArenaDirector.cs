@@ -22,6 +22,8 @@ public sealed class ArenaDirector : MonoBehaviour
 
     [Header("Completion Reward")]
     [SerializeField] private GameObject[] completionTimeOrbs = System.Array.Empty<GameObject>();
+    [SerializeField] private GameObject completionExit;
+    [SerializeField] private GameObject lockedExitIndicator;
 
     private bool started;
     private bool wave2Triggered;
@@ -38,6 +40,7 @@ public sealed class ArenaDirector : MonoBehaviour
         SetActiveArray(wave2Enemies, false);
         SetActiveArray(wave2TelegraphMarkers, false);
         SetActiveArray(completionTimeOrbs, false);
+        if (completionExit != null) completionExit.SetActive(false);
 
         wave1Alive = CountValid(wave1Enemies);
         totalAlive = wave1Alive + CountValid(wave2Enemies);
@@ -107,6 +110,8 @@ public sealed class ArenaDirector : MonoBehaviour
         if (completed || totalAlive > 0) return;
         completed = true;
         SetActiveArray(completionTimeOrbs, true);
+        if (lockedExitIndicator != null) lockedExitIndicator.SetActive(false);
+        if (completionExit != null) completionExit.SetActive(true);
     }
 
     private static int CountValid(Health[] list)

@@ -1,17 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/RetroChrome.uss"/>
     <Style src="project://database/Assets/UI/GameUI.uss?fileID=7433441132597879392&amp;guid=a1b2c3d4e5f647889900112233445501&amp;type=3#GameUI"/>
     <ui:VisualElement name="root" picking-mode="Ignore" class="ui-root">
         <ui:VisualElement name="danger-vignette" picking-mode="Ignore" class="vignette vignette--danger"/>
         <ui:VisualElement name="slow-vignette" picking-mode="Ignore" class="vignette vignette--slow"/>
         <ui:VisualElement name="hud-root" picking-mode="Ignore" class="screen hud-root">
-            <ui:VisualElement name="time-wrapper" picking-mode="Ignore" class="time-wrapper">
-                <ui:VisualElement picking-mode="Ignore" class="time-header">
-                    <ui:Label text="TIME" picking-mode="Ignore" class="micro-label"/>
+            <ui:VisualElement name="time-wrapper" picking-mode="Ignore" class="time-wrapper retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="time-header retro-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Time remaining" picking-mode="Ignore" class="retro-title"/>
                     <ui:Label name="time-gain-chevron" text="+" picking-mode="Ignore" class="time-gain-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement name="time-track" picking-mode="Ignore" class="time-track">
+                <ui:VisualElement name="time-track" picking-mode="Ignore" class="time-track retro-meter">
                     <ui:VisualElement name="time-trail" picking-mode="Ignore" class="time-trail"/>
-                    <ui:VisualElement name="time-fill" picking-mode="Ignore" class="time-fill" style="justify-content: center;"/>
+                    <ui:VisualElement name="time-fill" picking-mode="Ignore" class="time-fill retro-meter-gloss"/>
                     <ui:VisualElement name="time-cap-notch" picking-mode="Ignore" class="time-cap-notch"/>
                 </ui:VisualElement>
                 <ui:Label name="slow-chip" text="SLOWED" picking-mode="Ignore" class="slow-chip"/>
@@ -36,88 +38,121 @@
                 <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--bl"/>
                 <ui:VisualElement picking-mode="Ignore" class="hit-tick hit-tick--br"/>
             </ui:VisualElement>
-            <ui:VisualElement name="ammo-panel" picking-mode="Ignore" class="ammo-panel">
-                <ui:VisualElement picking-mode="Ignore" class="ammo-top-row">
-                    <ui:VisualElement name="ammo-pips" picking-mode="Ignore" class="ammo-pips">
-                        <ui:VisualElement name="ammo-pip-0" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-1" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-2" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-3" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-4" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-5" picking-mode="Ignore" class="ammo-pip"/>
-                        <ui:VisualElement name="ammo-pip-6" picking-mode="Ignore" class="ammo-pip"/>
-                    </ui:VisualElement>
-                    <ui:Label name="ammo-count" text="7" picking-mode="Ignore" class="ammo-count"/>
+            <ui:VisualElement name="ammo-panel" picking-mode="Ignore" class="ammo-panel retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label name="ammo-weapon-name" text="No weapon" picking-mode="Ignore" class="retro-title"/>
                 </ui:VisualElement>
-                <ui:Label name="reload-hint" text="RELOAD" picking-mode="Ignore" class="reload-hint"/>
+                <ui:VisualElement picking-mode="Ignore" class="ammo-body">
+                    <ui:VisualElement picking-mode="Ignore" class="ammo-top-row">
+                        <ui:VisualElement name="ammo-pips" picking-mode="Ignore" class="ammo-pips">
+                            <ui:VisualElement name="ammo-pip-0" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-1" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-2" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-3" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-4" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-5" picking-mode="Ignore" class="ammo-pip"/>
+                            <ui:VisualElement name="ammo-pip-6" picking-mode="Ignore" class="ammo-pip"/>
+                        </ui:VisualElement>
+                        <ui:Label name="ammo-count" text="--" picking-mode="Ignore" class="ammo-count"/>
+                        <ui:Label name="ammo-magazine-size" picking-mode="Ignore" class="ammo-magazine-size"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement picking-mode="Ignore" class="ammo-bottom-row">
+                        <ui:Label name="ammo-reserve" picking-mode="Ignore" class="ammo-reserve"/>
+                        <ui:Label name="reload-hint" text="Reload" picking-mode="Ignore" class="reload-hint"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="pause-root" picking-mode="Ignore" class="screen overlay-pause screen--hidden">
-            <ui:VisualElement class="modal-card">
-                <ui:Label text="PAUSED" class="screen-title"/>
-                <ui:VisualElement class="button-stack">
-                    <ui:Button name="btn-resume" text="RESUME" class="ui-button"/>
-                    <ui:Button name="btn-restart" text="RESTART" class="ui-button"/>
-                    <ui:Button name="btn-settings" text="SETTINGS" class="ui-button"/>
-                    <ui:Button name="btn-pause-mainmenu" text="MAIN MENU" class="ui-button"/>
-                    <ui:Button name="btn-quit" text="QUIT" class="ui-button"/>
+            <ui:VisualElement class="modal-card retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar window-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Game paused" picking-mode="Ignore" class="retro-title"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="window-body">
+                    <ui:Button name="btn-resume" text="Resume game" class="ui-button retro-button retro-button--primary"/>
+                    <ui:VisualElement class="button-row">
+                        <ui:Button name="btn-restart" text="Restart level" class="ui-button retro-button"/>
+                        <ui:Button name="btn-settings" text="Settings" class="ui-button retro-button"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="button-row">
+                        <ui:Button name="btn-pause-mainmenu" text="Main menu" class="ui-button retro-button"/>
+                        <ui:Button name="btn-quit" text="Quit" class="ui-button retro-button"/>
+                    </ui:VisualElement>
+                    <ui:Label text="Esc  Resume" picking-mode="Ignore" class="window-footer"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="settings-root" picking-mode="Ignore" class="screen overlay-pause screen--hidden">
-            <ui:VisualElement class="modal-card modal-card--settings">
-                <ui:Label text="SETTINGS" class="screen-title"/>
-                <ui:VisualElement class="settings-list">
-                    <ui:VisualElement class="settings-row">
-                        <ui:VisualElement class="settings-row-header">
-                            <ui:Label text="MOUSE SENSITIVITY" class="micro-label"/>
-                            <ui:Label name="val-mouse-sens" text="1.00x" class="settings-value"/>
-                        </ui:VisualElement>
-                        <ui:Slider name="slider-mouse-sens" low-value="0.2" high-value="3" value="1" class="settings-slider"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="settings-row">
-                        <ui:VisualElement class="settings-row-header">
-                            <ui:Label text="AIM SENSITIVITY" class="micro-label"/>
-                            <ui:Label name="val-aim-sens" text="0.60x" class="settings-value"/>
-                        </ui:VisualElement>
-                        <ui:Slider name="slider-aim-sens" low-value="0.2" high-value="1" value="0.6" class="settings-slider"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="settings-row">
-                        <ui:VisualElement class="settings-row-header">
-                            <ui:Label text="FIELD OF VIEW" class="micro-label"/>
-                            <ui:Label name="val-fov" text="78" class="settings-value"/>
-                        </ui:VisualElement>
-                        <ui:Slider name="slider-fov" low-value="70" high-value="110" value="78" class="settings-slider"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="settings-row">
-                        <ui:VisualElement class="settings-row-header">
-                            <ui:Label text="MASTER VOLUME" class="micro-label"/>
-                            <ui:Label name="val-volume" text="100%" class="settings-value"/>
-                        </ui:VisualElement>
-                        <ui:Slider name="slider-volume" low-value="0" high-value="1" value="1" class="settings-slider"/>
-                    </ui:VisualElement>
+            <ui:VisualElement class="modal-card modal-card--settings retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar window-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Settings" picking-mode="Ignore" class="retro-title"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="button-stack">
-                    <ui:Button name="btn-settings-back" text="BACK" class="ui-button"/>
+                <ui:VisualElement class="window-body">
+                    <ui:VisualElement class="settings-list">
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Mouse sensitivity" class="micro-label"/>
+                                <ui:Label name="val-mouse-sens" text="1.00x" class="settings-value"/>
+                            </ui:VisualElement>
+                            <ui:Slider name="slider-mouse-sens" low-value="0.2" high-value="3" value="1" class="settings-slider"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Aim sensitivity" class="micro-label"/>
+                                <ui:Label name="val-aim-sens" text="0.60x" class="settings-value"/>
+                            </ui:VisualElement>
+                            <ui:Slider name="slider-aim-sens" low-value="0.2" high-value="1" value="0.6" class="settings-slider"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Field of view" class="micro-label"/>
+                                <ui:Label name="val-fov" text="78" class="settings-value"/>
+                            </ui:VisualElement>
+                            <ui:Slider name="slider-fov" low-value="70" high-value="110" value="78" class="settings-slider"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Master volume" class="micro-label"/>
+                                <ui:Label name="val-volume" text="100%" class="settings-value"/>
+                            </ui:VisualElement>
+                            <ui:Slider name="slider-volume" low-value="0" high-value="1" value="1" class="settings-slider"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Button name="btn-settings-back" text="Back" class="ui-button retro-button retro-button--primary"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="death-root" picking-mode="Ignore" class="screen screen--death overlay-death screen--hidden">
-            <ui:VisualElement class="modal-card modal-card--danger">
-                <ui:Label text="OUT OF TIME" class="screen-title screen-title--danger"/>
-                <ui:VisualElement class="button-stack">
-                    <ui:Button name="btn-retry" text="RETRY" class="ui-button"/>
-                    <ui:Button name="btn-death-mainmenu" text="MAIN MENU" class="ui-button"/>
+            <ui:VisualElement class="modal-card retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar window-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Out of time" picking-mode="Ignore" class="retro-title"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="window-body">
+                    <ui:Label text="Retry starts the level over." class="dialog-status dialog-status--danger"/>
+                    <ui:VisualElement class="button-row">
+                        <ui:Button name="btn-retry" text="Retry level" class="ui-button retro-button retro-button--primary"/>
+                        <ui:Button name="btn-death-mainmenu" text="Main menu" class="ui-button retro-button"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="escape-root" picking-mode="Ignore" class="screen overlay-escape screen--hidden">
-            <ui:VisualElement class="escape-stack">
-                <ui:Label name="escape-line-1" text="You escaped." class="escape-line"/>
-                <ui:Label name="escape-line-2" text="Thanks for playing." class="escape-line escape-line--sub"/>
-                <ui:VisualElement name="escape-actions" class="escape-actions">
-                    <ui:Button name="btn-escape-nextlevel" text="NEXT LEVEL" class="ui-button hidden-display"/>
-                    <ui:Button name="btn-escape-mainmenu" text="MAIN MENU" class="ui-button"/>
+            <ui:VisualElement class="modal-card retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar window-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Extraction" picking-mode="Ignore" class="retro-title"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="window-body">
+                    <ui:Label name="escape-line-1" text="You escaped." class="escape-line"/>
+                    <ui:Label name="escape-line-2" text="Thanks for playing." class="escape-line escape-line--sub"/>
+                    <ui:VisualElement name="escape-actions" class="escape-actions button-row">
+                        <ui:Button name="btn-escape-nextlevel" text="Next level" class="ui-button retro-button retro-button--primary hidden-display"/>
+                        <ui:Button name="btn-escape-mainmenu" text="Main menu" class="ui-button retro-button"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

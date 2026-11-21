@@ -16,17 +16,9 @@ public class LoadingScreen : MonoBehaviour
 
     [Header("Scene Flow")]
     [Tooltip("Used if LoadingData.nextScene is empty (e.g. when testing the Loading scene directly).")]
-    [SerializeField] private string fallbackScene = "SampleScene";
-    [SerializeField] private float fadeInDuration = 0.3f;
-    [SerializeField] private float fadeOutDuration = 0.3f;
-
-    [Header("Fake Sequence Timing (~5s total)")]
-    [SerializeField, Range(1f, 98f)] private float fastPhaseEndPercent = 60f;
-    [SerializeField] private float fastPhaseDuration = 1.2f;
-    [SerializeField, Range(1f, 99f)] private float slowPhaseEndPercent = 99f;
-    [SerializeField] private float slowPhaseDuration = 1.9f;
-    [SerializeField] private float holdAt99Duration = 1.5f;
-    [SerializeField] private float holdAt100Duration = 0.25f;
+    [SerializeField] private string fallbackScene = "MainMenu";
+    [SerializeField, Min(0f)] private float fadeInDuration = 0.18f;
+    [SerializeField, Min(0f)] private float fadeOutDuration = 0.18f;
 
     [Header("Messages")]
     [SerializeField] private MessageThreshold[] messageThresholds = new MessageThreshold[]
@@ -118,45 +110,40 @@ public class LoadingScreen : MonoBehaviour
 
     private IEnumerator RunLoadingFlow()
     {
-        string targetScene = string.IsNullOrEmpty(LoadingData.nextScene) ? fallbackScene : LoadingData.nextScene;
-        AsyncOperation loadOp = null;
+        string targetScene = LoadingData.nextScene;
+        LoadingData.nextScene = "";
 
-        if (!string.IsNullOrEmpty(targetScene) && Application.CanStreamedLevelBeLoaded(targetScene))
+        if (!CanLoadDestination(targetScene))
         {
-            loadOp = SceneManager.LoadSceneAsync(targetScene);
-            if (loadOp != null)
-                loadOp.allowSceneActivation = false;
-        }
-        else
-        {
-            Debug.LogWarning($"[LoadingScreen] Target scene '{targetScene}' is not in Build Settings. Running visual sequence only.");
+            if (!string.IsNullOrWhiteSpace(targetScene))
+                Debug.LogWarning($"[LoadingScreen] Destination '{targetScene}' is unavailable. Trying '{fallbackScene}'.", this);
+
+            targetScene = fallbackScene;
         }
 
-        // 1. Fade in from white (0.3s)
+        AsyncOperation loadOp = CanLoadDestination(targetScene) ? SceneManager.LoadSceneAsync(targetScene) : null;
+        if (loadOp == null)
+        {
+            Debug.LogError($"[LoadingScreen] Could not load scene '{targetScene}'.", this);
+            yield return Fade(1f, 0f, fadeInDuration);
+            if (messageText != null)
+                messageText.text = "Unable to load the next scene.";
+            yield break;
+        }
+
+        loadOp.allowSceneActivation = false;
         yield return Fade(1f, 0f, fadeInDuration);
 
-        // 2. Start fake loading sequence + random glitches
         sequenceRunning = true;
         Coroutine glitchRoutine = enableGlitches ? StartCoroutine(RunRandomGlitches()) : null;
 
-        // Phase A: 0% -> 60% fast
-        yield return AnimatePercent(0f, fastPhaseEndPercent, fastPhaseDuration, t => t);
-
-        // Phase B: 60% -> 99% slow down (ease-out)
-        yield return AnimatePercent(fastPhaseEndPercent, slowPhaseEndPercent, slowPhaseDuration, t => 1f - (1f - t) * (1f - t));
-
-        // Phase C: Hold at 99% (~1.5s)
-        ApplyProgress(slowPhaseEndPercent);
-        yield return new WaitForSecondsRealtime(Mathf.Max(0f, holdAt99Duration));
-
-        // Wait if the real async load hasn't reached 0.9 yet
-        if (loadOp != null)
+        // Unity stops at 0.9 until the scene is allowed to activate.
+        while (loadOp.progress < 0.9f)
         {
-            while (loadOp.progress < 0.9f)
-                yield return null;
+            ApplyProgress(loadOp.progress / 0.9f * 100f);
+            yield return null;
         }
 
-        // Phase D: Jump to 100%
         ApplyProgress(100f);
         sequenceRunning = false;
         if (glitchRoutine != null)
@@ -165,39 +152,14 @@ public class LoadingScreen : MonoBehaviour
             RestoreVisualsAfterGlitch();
         }
 
-        if (holdAt100Duration > 0f)
-            yield return new WaitForSecondsRealtime(holdAt100Duration);
-
-        // 3. Fade to white
         yield return Fade(0f, 1f, fadeOutDuration);
-
-        // 4. Activate target scene
-        if (loadOp != null)
-        {
-            loadOp.allowSceneActivation = true;
-        }
+        loadOp.allowSceneActivation = true;
     }
 
-    private IEnumerator AnimatePercent(float from, float to, float duration, Func<float, float> ease)
-    {
-        if (duration <= 0f)
-        {
-            ApplyProgress(to);
-            yield break;
-        }
-
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            float value = Mathf.Lerp(from, to, ease(t));
-            ApplyProgress(value);
-            yield return null;
-        }
-
-        ApplyProgress(to);
-    }
+    private bool CanLoadDestination(string sceneName) => !string.IsNullOrWhiteSpace(sceneName)
+        && !string.Equals(sceneName, gameObject.scene.name, StringComparison.OrdinalIgnoreCase)
+        && !string.Equals(sceneName, gameObject.scene.path, StringComparison.OrdinalIgnoreCase)
+        && Application.CanStreamedLevelBeLoaded(sceneName);
 
     private void ApplyProgress(float percent)
     {

@@ -6,6 +6,7 @@ using UnityEngine;
 /// Central player hit receiver for enemy attacks (Time-as-Health).
 /// Attach to the Player GameObject alongside RigidbodyFpsController.
 /// </summary>
+[DisallowMultipleComponent]
 public class PlayerHitReceiver : MonoBehaviour
 {
     [Header("References (auto-found if empty)")]
@@ -98,13 +99,26 @@ public class PlayerHitReceiver : MonoBehaviour
 
         while (elapsed < turretCameraShakeDuration)
         {
-            elapsed += Time.deltaTime;
             float t = 1f - Mathf.Clamp01(elapsed / turretCameraShakeDuration);
-            cameraRig.WeaponRecoilAngles = startKick * (t * t);
+            cameraRig.HitKickAngles = startKick * (t * t);
             yield return null;
+            elapsed += Time.deltaTime;
         }
 
-        cameraRig.WeaponRecoilAngles = Vector2.zero;
+        cameraRig.HitKickAngles = Vector2.zero;
         shakeRoutine = null;
+    }
+
+    private void OnDisable() => ClearCameraKick();
+
+    internal void ClearCameraKick()
+    {
+        if (shakeRoutine != null)
+        {
+            StopCoroutine(shakeRoutine);
+            shakeRoutine = null;
+        }
+        if (cameraRig != null)
+            cameraRig.HitKickAngles = Vector2.zero;
     }
 }

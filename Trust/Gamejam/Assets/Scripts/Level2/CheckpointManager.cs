@@ -9,6 +9,7 @@ public class CheckpointManager : MonoBehaviour
 
     public Vector3 SpawnPosition { get; private set; }
     public Quaternion SpawnRotation { get; private set; }
+    private bool hasSpawnPoint;
 
     private void Awake()
     {
@@ -16,8 +17,7 @@ public class CheckpointManager : MonoBehaviour
         RigidbodyFpsController player = FindFirstObjectByType<RigidbodyFpsController>();
         if (player != null)
         {
-            SpawnPosition = player.transform.position;
-            SpawnRotation = player.transform.rotation;
+            SetCheckpoint(player.transform.position, player.transform.rotation);
         }
     }
 
@@ -31,11 +31,18 @@ public class CheckpointManager : MonoBehaviour
     {
         SpawnPosition = position;
         SpawnRotation = rotation;
+        hasSpawnPoint = true;
     }
 
     public void RespawnPlayer(Transform playerRoot)
     {
-        if (playerRoot == null) return;
+        if (playerRoot == null || !hasSpawnPoint) return;
+
+        if (playerRoot.TryGetComponent(out RigidbodyFpsController motor))
+        {
+            motor.RespawnAt(SpawnPosition, SpawnRotation);
+            return;
+        }
 
         Rigidbody rb = playerRoot.GetComponent<Rigidbody>();
         if (rb != null)
@@ -43,10 +50,11 @@ public class CheckpointManager : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.position = SpawnPosition;
+            rb.rotation = SpawnRotation;
         }
         else
         {
-            playerRoot.position = SpawnPosition;
+            playerRoot.SetPositionAndRotation(SpawnPosition, SpawnRotation);
         }
     }
 }

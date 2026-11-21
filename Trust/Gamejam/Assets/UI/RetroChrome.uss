@@ -1,0 +1,108 @@
+:root {
+    --chrome-key: #224b9d;
+    --chrome-blue: #285db7;
+    --chrome-ink: #172a50;
+    --chrome-paper: #f2eddd;
+    --chrome-surface: #e5e8ed;
+    --chrome-shadow: #768ba8;
+    --chrome-white: #fcfdff;
+    --chrome-green: #71c247;
+}
+
+.retro-frame {
+    background-color: var(--chrome-paper);
+    border-width: 2px;
+    border-color: var(--chrome-key);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding: 2px;
+    overflow: hidden;
+}
+
+.retro-titlebar {
+    background-color: var(--chrome-blue);
+    background-image: url("project://database/Assets/UI/Chrome/TitleBlue.png");
+    background-size: 100% 100%;
+    min-height: 28px;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-top-width: 1px;
+    border-top-color: #8ec6ff;
+    border-bottom-width: 1px;
+    border-bottom-color: #1c4699;
+}
+
+.retro-title {
+    flex-grow: 1;
+    font-size: 14px;
+    color: white;
+    -unity-font-style: bold;
+    margin: 0;
+    padding: 0;
+}
+
+.retro-app-icon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    margin-right: 7px;
+    background-color: #b6edff;
+    border-width: 2px;
+    border-color: #e8fbff #4b69b3 #4b69b3 #e8fbff;
+    border-radius: 3px;
+}
+
+.retro-button {
+    background-color: #faf8f0;
+    background-image: url("project://database/Assets/UI/Chrome/ButtonIvory.png");
+    background-size: 100% 100%;
+    color: var(--chrome-ink);
+    border-width: 1px;
+    border-color: #6e82a5;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    -unity-font-style: bold;
+}
+
+.retro-button--primary {
+    border-color: #1c61ca;
+    border-width: 2px;
+    -unity-background-image-tint-color: #dcecff;
+    background-color: #e9f4ff;
+}
+
+.retro-button:hover {
+    border-color: #326cd2;
+    -unity-background-image-tint-color: #e8f4ff;
+}
+
+.retro-button:focus {
+    border-color: #215ac0;
+    border-width: 2px;
+    -unity-background-image-tint-color: #d0e8ff;
+}
+
+.retro-button:active {
+    background-image: none;
+    background-color: #d3e2fa;
+    border-color: #355994;
+}
+
+.retro-meter {
+    background-color: #dfe4eb;
+    border-width: 1px;
+    border-color: var(--chrome-shadow) var(--chrome-white) var(--chrome-white) var(--chrome-shadow);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.retro-meter-gloss {
+    background-image: url("project://database/Assets/UI/Chrome/MeterGloss.png");
+    background-size: 100% 100%;
+}

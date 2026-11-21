@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AssaultRifle
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Assault Rifle
-  weaponType: 3
+  weaponType: 4
   viewModel: {fileID: 1205038738887758992, guid: e4f5a6b7c8d940112233445566778804, type: 3}
   pickupPrefab: {fileID: 8472788880770097467, guid: e4f5a6b7c8d940112233445566778805, type: 3}
   fireMode: 1

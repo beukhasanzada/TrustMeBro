@@ -305,6 +305,8 @@ GameObject:
   - component: {fileID: 4210530374399802914}
   - component: {fileID: 1651929327248517410}
   - component: {fileID: 1139149692854645048}
+  - component: {fileID: 7942640131737439701}
+  - component: {fileID: 7942640131737439702}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -312,6 +314,44 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7942640131737439701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7763625136924699309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c2d3e4f5a647889900112233445511, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlow
+  fpsController: {fileID: 0}
+--- !u!114 &7942640131737439702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7763625136924699309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e043d9ac1ff2645a1a93d556bd2199, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHitReceiver
+  fpsController: {fileID: 0}
+  cameraRig: {fileID: 0}
+  playerSlow: {fileID: 0}
+  hitCooldown: 0.15
+  hitSlowMultiplier: 0.55
+  hitSlowDuration: 1.5
+  defaultKnockbackStrength: 8
+  knockbackUpwardShare: 0.25
+  knockbackDecay: 26
+  rangedVignetteStrength: 0.45
+  rangedVignetteDuration: 0.15
+  turretCameraShakeStrength: 1.4
+  turretCameraShakeDuration: 0.12
 --- !u!4 &4634331421669947685
 Transform:
   m_ObjectHideFlags: 0

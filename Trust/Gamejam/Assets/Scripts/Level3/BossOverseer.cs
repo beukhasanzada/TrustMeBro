@@ -195,6 +195,7 @@ public sealed class BossOverseer : EnemyBase
     private void FireVolley()
     {
         if (projectilePrefab == null || playerTransform == null) return;
+        if (!playerTransform.TryGetComponent(out Health target)) return;
         Transform muzzle = fireMuzzle != null ? fireMuzzle : transform;
         Vector3 aimTarget = playerTransform.position + Vector3.up * 0.9f;
         Vector3 baseDir = (aimTarget - muzzle.position).normalized;
@@ -205,7 +206,7 @@ public sealed class BossOverseer : EnemyBase
             float yawOffset = (i - mid) * volleySpreadAngle;
             Vector3 dir = Quaternion.AngleAxis(yawOffset, Vector3.up) * baseDir;
             EnemyLaserProjectile proj = Instantiate(projectilePrefab, muzzle.position, Quaternion.LookRotation(dir));
-            proj.LaunchRanged(transform, null, projectileTimePenalty, projectileLayers);
+            proj.LaunchRanged(transform, target, projectileTimePenalty, projectileLayers);
         }
     }
 

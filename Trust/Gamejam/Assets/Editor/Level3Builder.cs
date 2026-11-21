@@ -495,7 +495,7 @@ public static class Level3Builder
         soSw.FindProperty("pulseLight").objectReferenceValue = pulseLight;
         soSw.ApplyModifiedPropertiesWithoutUndo();
 
-        // Exit Portal -> SampleScene via Loading
+        // Exit Portal -> MainMenu via Loading
         GameObject exitRoot = new GameObject("Level3_ExitPortal");
         exitRoot.transform.SetParent(parent, false);
         exitRoot.transform.position = new Vector3(0f, 9.9f, 338.0f);
@@ -506,7 +506,7 @@ public static class Level3Builder
         pCol.size = new Vector3(3.4f, 4.0f, 2.2f);
         PortalTrigger portalTrigger = exitRoot.AddComponent<PortalTrigger>();
         SerializedObject soPt = new SerializedObject(portalTrigger);
-        soPt.FindProperty("targetScene").stringValue = "SampleScene";
+        soPt.FindProperty("targetScene").stringValue = "MainMenu";
         soPt.FindProperty("loadingSceneName").stringValue = "Loading";
         soPt.FindProperty("playerTag").stringValue = "Player";
         soPt.ApplyModifiedPropertiesWithoutUndo();
@@ -1294,8 +1294,9 @@ public static class Level3Builder
     {
         string[] orderedPaths =
         {
-            "Assets/Scenes/SampleScene.unity",
+            "Assets/Scenes/MainMenu.unity",
             "Assets/Scenes/Loading.unity",
+            "Assets/Scenes/TutorialScene.unity",
             "Assets/Scenes/Level1.unity",
             "Assets/Scenes/Level2.unity",
             ScenePath
