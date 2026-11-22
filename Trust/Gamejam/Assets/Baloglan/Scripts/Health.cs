@@ -14,6 +14,12 @@ public sealed class Health : MonoBehaviour, IWeaponDamageable
 
     void Awake() => CurrentHealth = maxHealth;
 
+    internal void SetSpawnHealth(float value)
+    {
+        maxHealth = Mathf.Max(1f, value);
+        CurrentHealth = maxHealth;
+    }
+
     public void TakeDamage(float amount)
     {
         if (!IsAlive || !(amount > 0f))

@@ -41,6 +41,7 @@ public sealed class MinionSpawner : MonoBehaviour
     private readonly List<int> validIndices = new List<int>(8);
 
     private Transform playerTransform;
+    private Transform poolRoot;
     private Coroutine spawnLoopRoutine;
     private int currentPhase = 1;
     private bool encounterActive;
@@ -66,18 +67,22 @@ public sealed class MinionSpawner : MonoBehaviour
     private void WarmPool()
     {
         if (minionPrefab == null) return;
+        var storage = new GameObject("Inactive Minions");
+        poolRoot = storage.transform;
+        poolRoot.SetParent(transform, false);
+        storage.SetActive(false);
         for (int i = 0; i < poolSize; i++)
             inactivePool.Enqueue(CreatePooledMinion());
     }
 
     private GameObject CreatePooledMinion()
     {
-        GameObject go = Instantiate(minionPrefab, transform);
+        GameObject go = Instantiate(minionPrefab, poolRoot);
         go.SetActive(false);
 
         Health h = go.GetComponent<Health>();
         if (h != null)
-            SetMaxHealth(h, minionHealth);
+            h.SetSpawnHealth(minionHealth);
 
         HealthTimeReward reward = go.GetComponent<HealthTimeReward>() ?? go.AddComponent<HealthTimeReward>();
         reward.secondsReward = minionSecondsReward;
@@ -139,7 +144,7 @@ public sealed class MinionSpawner : MonoBehaviour
             int toSpawn = Mathf.Min(desired, available);
             if (toSpawn <= 0) continue;
 
-            yield return StartCoroutine(SpawnBatchWithTelegraph(toSpawn));
+            yield return SpawnBatchWithTelegraph(toSpawn);
         }
     }
 
@@ -204,6 +209,9 @@ public sealed class MinionSpawner : MonoBehaviour
 
     private void ActivatePooledMinion(Transform point)
     {
+        if (!NavMesh.SamplePosition(point.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            return;
+
         GameObject go = null;
         while (inactivePool.Count > 0 && go == null)
             go = inactivePool.Dequeue();
@@ -211,13 +219,8 @@ public sealed class MinionSpawner : MonoBehaviour
         if (go == null)
             go = CreatePooledMinion();
 
-        go.transform.SetParent(null);
-        go.transform.SetPositionAndRotation(point.position, point.rotation);
-
-        NavMeshAgent agent = go.GetComponent<NavMeshAgent>();
-        if (agent != null && NavMesh.SamplePosition(point.position, out NavMeshHit hit, 3f, NavMesh.AllAreas))
-            agent.Warp(hit.position);
-
+        go.transform.SetParent(transform, false);
+        go.transform.SetPositionAndRotation(hit.position, point.rotation);
         go.SetActive(true);
 
         Health h = go.GetComponent<Health>();
@@ -240,17 +243,4 @@ public sealed class MinionSpawner : MonoBehaviour
             OnCapStateChanged?.Invoke(false);
     }
 
-    private static void SetMaxHealth(Health h, float value)
-    {
-#if UNITY_EDITOR
-        var so = new UnityEditor.SerializedObject(h);
-        so.FindProperty("maxHealth").floatValue = value;
-        so.ApplyModifiedPropertiesWithoutUndo();
-#else
-        var field = typeof(Health).GetField("maxHealth", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        field?.SetValue(h, value);
-        var prop = typeof(Health).GetProperty("CurrentHealth", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-        prop?.SetValue(h, value);
-#endif
-    }
 }
