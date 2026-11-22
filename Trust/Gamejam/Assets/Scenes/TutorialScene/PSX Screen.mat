@@ -25,8 +25,8 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _DitherStrength: 0.83
-    - _VerticalPixels: 216
+    - _DitherStrength: 0.28
+    - _VerticalPixels: 320
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

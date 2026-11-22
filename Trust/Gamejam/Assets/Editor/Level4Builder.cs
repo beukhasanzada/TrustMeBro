@@ -17,7 +17,7 @@ using UnityEngine.SceneManagement;
 /// Auto-builds if Assets/Scenes/Level4.unity is missing or outdated and appends cleanly to Build Settings.
 /// Run via: Tools -> Level 4 -> Build Complete Level 4 (or Tools -> Build Level 4)
 /// </summary>
-public static class Level4Builder
+public static partial class Level4Builder
 {
     public const string ScenePath = "Assets/Scenes/Level4.unity";
     private const string NavAssetPath = "Assets/Scenes/Level4_NavMesh.asset";
@@ -78,8 +78,6 @@ public static class Level4Builder
     private const float DeskD = 2.57f;
     private const float DeskRowStepZ = 2.62f;    // 0.05m seam (zero z-fighting)
     private const float StripWidth = 4.97f;      // 1-col ConfDesk expressway bridge
-    private const float WideWidth = 10.01f;      // 2-col ConfDesk arena deck
-    private const float BoardroomWidth = 15.05f; // 3-col ConfDesk Finale
     private const float WallPanelLen = 3.06f;
 
     private const int GroundLayer = 3; // Layer 3: Ground (used by player & NavMeshSurface)
@@ -169,7 +167,7 @@ public static class Level4Builder
         (z, y) = BuildS4_Combo3_SlideGantryDashSteps(sec4, gameplayRoot, enemiesRoot, orbsRoot, z, y);
         (z, y) = BuildS5_Combo4_BlastStaircaseWall(sec5, gameplayRoot, enemiesRoot, orbsRoot, z, y);
         (z, y) = BuildS6_Combo5_BlastTwinWallExit(sec6, gameplayRoot, enemiesRoot, orbsRoot, z, y);
-        BuildS7_MultiTierBoardroomFinale(sec7, enemiesRoot, orbsRoot, z, y);
+        BuildS7_MultiTierBoardroomFinale(sec7, gameplayRoot, enemiesRoot, orbsRoot, z, y);
 
         BuildFloatingOfficeVoidDecor();
 
@@ -184,7 +182,7 @@ public static class Level4Builder
         if (SceneView.lastActiveSceneView != null)
             SceneView.lastActiveSceneView.Frame(new Bounds(new Vector3(0f, 6f, 145f), new Vector3(52f, 24f, 300f)), false);
 
-        Debug.Log($"[Level4Builder] Built Platformer Level 4 at {ScenePath}: {propCount} Office props, {rangedCount} RangedCrystal + {turretCount} CrystalTurret = {rangedCount + turretCount} enemies, {orbCount} TimeOrbs, NavMesh baked, 7 checkpoints.");
+        Debug.Log($"[Level4Builder] Built Level 4 at {ScenePath}: {propCount} Office props, {rangedCount} ranged crystals, {turretCount} turrets, the Mainframe boss, {orbCount} time orbs and 8 checkpoints.");
     }
 
     // =========================================================================
@@ -433,7 +431,7 @@ public static class Level4Builder
     // S7: MULTI-TIER BOARDROOM FINALE + ELEVATED SNIPER PADS + EXIT ISLAND
     // =========================================================================
     private static void BuildS7_MultiTierBoardroomFinale(
-        Transform parent, Transform enemies, Transform orbs, float prevEndZ, float y)
+        Transform parent, Transform gameplay, Transform enemies, Transform orbs, float prevEndZ, float y)
     {
         const float entryGap = 5.50f;
         float boardStart = prevEndZ + entryGap; // 265.88
@@ -500,28 +498,12 @@ public static class Level4Builder
         soGate.FindProperty("completeStepWhenCleared").boolValue = false;
         soGate.ApplyModifiedPropertiesWithoutUndo();
 
-        // Final Suspended Victory Portal Island (4.80m leap +0.90m rise from Boardroom front edge)
+        // The suspended transfer island links the Boardroom and the Mainframe.
         float portalIslandStart = boardEnd + 4.80f;
         float portalIslandY = y + 0.90f; // 11.15
         float portalCenterZ = portalIslandStart + 4.97f * 0.5f;
         BuildDeskIsland(parent, "S7_ExitPortal_Island", new Vector3(0f, portalIslandY, portalCenterZ));
-        CreateTimeOrb(orbs, "S7_VictoryOrb", new Vector3(0f, portalIslandY + 0.6f, boardEnd + 2.4f));
-
-        GameObject exitRoot = new GameObject("Level4_ExitPortal");
-        exitRoot.transform.SetParent(parent, false);
-        exitRoot.transform.position = new Vector3(0f, portalIslandY + 1.70f, portalCenterZ + 0.6f);
-        exitRoot.transform.localScale = Vector3.one;
-        PlaceSimplePrefab(ExitPortalPath, exitRoot.transform, "ExitPortal_Visual", Vector3.zero, 0f, local: true);
-
-        BoxCollider pCol = exitRoot.AddComponent<BoxCollider>();
-        pCol.isTrigger = true;
-        pCol.size = new Vector3(4.0f, 4.2f, 2.5f);
-        PortalTrigger pt = exitRoot.AddComponent<PortalTrigger>();
-        SerializedObject soPt = new SerializedObject(pt);
-        soPt.FindProperty("targetScene").stringValue = "SampleScene";
-        soPt.FindProperty("loadingSceneName").stringValue = "Loading";
-        soPt.FindProperty("playerTag").stringValue = "Player";
-        soPt.ApplyModifiedPropertiesWithoutUndo();
+        BuildMainframeArena(gameplay, portalIslandY, portalIslandStart + 4.97f);
     }
 
     // =========================================================================
@@ -613,7 +595,7 @@ public static class Level4Builder
         float firstRowZ = topCenter.z - totalLenZ * 0.5f + DeskD * 0.5f;
         const float colStepX = 5.04f;
         float firstColX = topCenter.x - (cols - 1) * colStepX * 0.5f;
-        float totalW = (cols == 3) ? BoardroomWidth : WideWidth;
+        float totalW = (cols - 1) * colStepX + StripWidth;
 
         for (int iz = 0; iz < rows; iz++)
         {
@@ -806,21 +788,33 @@ public static class Level4Builder
 
     private static void BakeNavMeshSurface(Transform root)
     {
-        GameObject navGo = new GameObject("Level4_NavMesh");
-        navGo.transform.SetParent(root, false);
-        NavMeshSurface surface = navGo.AddComponent<NavMeshSurface>();
+        NavMeshSurface surface = root.GetComponentInChildren<NavMeshSurface>();
+        if (surface == null)
+        {
+            GameObject navGo = new GameObject("Level4_NavMesh");
+            navGo.transform.SetParent(root, false);
+            surface = navGo.AddComponent<NavMeshSurface>();
+        }
+
+        NavMeshData existing = AssetDatabase.LoadAssetAtPath<NavMeshData>(NavAssetPath);
         surface.collectObjects = CollectObjects.All;
         surface.layerMask = 1 << GroundLayer;
         surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
         surface.BuildNavMesh();
 
-        if (surface.navMeshData != null)
+        NavMeshData baked = surface.navMeshData;
+        if (baked == null) return;
+        if (existing == null)
+            AssetDatabase.CreateAsset(baked, NavAssetPath);
+        else
         {
-            if (AssetDatabase.LoadAssetAtPath<NavMeshData>(NavAssetPath) != null)
-                AssetDatabase.DeleteAsset(NavAssetPath);
-            AssetDatabase.CreateAsset(surface.navMeshData, NavAssetPath);
-            AssetDatabase.SaveAssets();
+            surface.RemoveData();
+            EditorUtility.CopySerialized(baked, existing);
+            surface.navMeshData = existing;
+            surface.AddData();
+            EditorUtility.SetDirty(existing);
         }
+        AssetDatabase.SaveAssets();
     }
 
     // =========================================================================

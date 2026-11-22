@@ -33774,7 +33774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eced3d2cbd444c549ada4c5c699fad91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PortalTrigger
-  targetScene: MainMenu
+  targetScene: Level4
   loadingSceneName: Loading
   playerTag: Player
 --- !u!65 &381557915
