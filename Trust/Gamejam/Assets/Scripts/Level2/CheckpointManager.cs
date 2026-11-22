@@ -41,6 +41,7 @@ public class CheckpointManager : MonoBehaviour
         if (playerRoot.TryGetComponent(out RigidbodyFpsController motor))
         {
             motor.RespawnAt(SpawnPosition, SpawnRotation);
+            ResetActivityTimers();
             return;
         }
 
@@ -56,5 +57,13 @@ public class CheckpointManager : MonoBehaviour
         {
             playerRoot.SetPositionAndRotation(SpawnPosition, SpawnRotation);
         }
+
+        ResetActivityTimers();
+    }
+
+    private static void ResetActivityTimers()
+    {
+        if (TimeManager.Instance != null && !TimeManager.Instance.IsDepleted)
+            TimeManager.Instance.ResetTimer();
     }
 }

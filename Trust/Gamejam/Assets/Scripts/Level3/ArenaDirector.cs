@@ -109,7 +109,6 @@ public sealed class ArenaDirector : MonoBehaviour
     {
         if (completed || totalAlive > 0) return;
         completed = true;
-        SetActiveArray(completionTimeOrbs, true);
         if (lockedExitIndicator != null) lockedExitIndicator.SetActive(false);
         if (completionExit != null) completionExit.SetActive(true);
     }

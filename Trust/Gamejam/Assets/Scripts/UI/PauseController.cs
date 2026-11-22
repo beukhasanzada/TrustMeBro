@@ -70,6 +70,7 @@ public class PauseController : MonoBehaviour
         if (IsPaused) return;
         IsPaused = true;
 
+        CombatFeelManager.CancelSlowmo();
         Time.timeScale = 0f;
         timeManager?.StopTimer();
         SetGameplayControlActive(false);

@@ -48,9 +48,12 @@ public sealed class FpsCameraRig : MonoBehaviour
     float bobWeight;
     float stanceOffset;
     float roll;
+    float hitFovPunch;
 
     public Vector2 WeaponRecoilAngles { get; set; }
     public Vector2 HitKickAngles { get; set; }
+
+    public void AddHitFovPunch(float delta) => hitFovPunch = Mathf.Clamp(hitFovPunch + delta, -5f, 5f);
 
     public void ResetAfterRespawn()
     {
@@ -58,7 +61,7 @@ public sealed class FpsCameraRig : MonoBehaviour
             return;
 
         yaw = orientation.localEulerAngles.y;
-        pitch = bobPhase = bobWeight = stanceOffset = roll = 0f;
+        pitch = bobPhase = bobWeight = stanceOffset = roll = hitFovPunch = 0f;
         lookDegrees = sway = HitKickAngles = WeaponRecoilAngles = Vector2.zero;
         transform.SetLocalPositionAndRotation(restPosition, orientation.localRotation);
         fpsCamera.PreviousStateIsValid = false;
@@ -154,9 +157,11 @@ public sealed class FpsCameraRig : MonoBehaviour
         transform.localRotation = orientation.localRotation
             * Quaternion.Euler(recoilPitch + sway.y, aimOffset.y - sway.x, roll);
 
+        hitFovPunch = Mathf.Lerp(hitFovPunch, 0f, 1f - Mathf.Exp(-18f * Time.unscaledDeltaTime));
         float fovBoost = motor.IsDashing ? dashFovBoost : motor.IsSprinting ? sprintFovBoost : 0f;
-        float targetFov = Mathf.Max(30f, GameSettings.Fov + fovBoost - (IsAiming ? aimFovReduction : 0f));
-        float fovBlend = 1f - Mathf.Exp(-aimZoomSpeed * dt);
+        float targetFov = Mathf.Max(30f, GameSettings.Fov + fovBoost + hitFovPunch - (IsAiming ? aimFovReduction : 0f));
+        float fovDt = Mathf.Abs(hitFovPunch) > 0.05f ? Time.unscaledDeltaTime : dt;
+        float fovBlend = 1f - Mathf.Exp(-aimZoomSpeed * fovDt);
         fpsCamera.Lens.FieldOfView = Mathf.Lerp(fpsCamera.Lens.FieldOfView, targetFov, fovBlend);
     }
 }

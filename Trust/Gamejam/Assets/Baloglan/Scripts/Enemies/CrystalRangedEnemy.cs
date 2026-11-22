@@ -20,6 +20,8 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
     [Header("Attack")]
     [SerializeField, Min(0.1f)] float attackRange = 20f;
     [SerializeField, Min(0f)] float attackCooldown = 0.9f;
+    [SerializeField, Min(0.5f)] float fireRateMultiplier = 1.25f;
+    [SerializeField, Min(0.5f)] float aimSpeedMultiplier = 2.0f;
     [SerializeField, Min(0f)] float damage = 12f;
     [SerializeField, Min(0f)] float timePenaltySeconds = 0.5f;
     [SerializeField] EnemyLaserProjectile laserPrefab;
@@ -40,7 +42,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
 
     const float RepathInterval = 0.15f;
     const float FlashDuration = 0.22f;
-    const float FacingTolerance = 8f;
+    const float FacingTolerance = 15f;
 
     readonly RaycastHit[] sightHits = new RaycastHit[16];
     NavMeshAgent agent;
@@ -108,7 +110,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
         {
             if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
             {
-                nextAttackAt = Time.time + attackCooldown;
+                nextAttackAt = Time.time + attackCooldown / Mathf.Max(0.5f, fireRateMultiplier);
                 SetAnimation(Idle);
             }
             return;
@@ -139,6 +141,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
     {
         RestoreAnimatedPose();
         StopAgent();
+        if (animator != null) animator.speed = 1f;
         animationState = 0;
         shotRequested = false;
         flashUntil = 0f;
@@ -216,7 +219,7 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
         if (direction.sqrMagnitude > 0.0001f)
         {
             Quaternion desired = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Mathf.Max(0.5f, aimSpeedMultiplier) * Time.deltaTime);
         }
     }
 
@@ -234,13 +237,14 @@ public sealed class CrystalRangedEnemy : MonoBehaviour
             shotFired = false;
             shotRequested = false;
         }
+        animator.speed = state == Attack ? fireRateMultiplier : 1f;
         animator.Play(state, 0, 0f);
     }
 
     void AimRig(Vector3 point)
     {
         float phase = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        float lift = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.33f, 0.68f, phase));
+        float lift = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.10f, 0.34f, phase));
         float release = Mathf.SmoothStep(1f, 0f, Mathf.InverseLerp(0.83f, 1f, phase));
         float weight = shotRequested ? 1f : lift * release;
         if (weight <= 0f)

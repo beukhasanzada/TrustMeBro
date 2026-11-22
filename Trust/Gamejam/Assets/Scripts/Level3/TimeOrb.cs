@@ -15,6 +15,7 @@ public sealed class TimeOrb : MonoBehaviour
     [SerializeField] private Light orbLight;
     [SerializeField] private Transform visualSpinTarget;
     [SerializeField, Min(0.05f)] private float popDuration = 0.22f;
+    [SerializeField] private bool hideWorldOrb = true;
 
     private bool collected;
     private Collider triggerCollider;
@@ -23,9 +24,21 @@ public sealed class TimeOrb : MonoBehaviour
 
     private void Awake()
     {
+        if (hideWorldOrb)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         triggerCollider = GetComponent<Collider>();
         if (triggerCollider != null)
             triggerCollider.isTrigger = true;
+    }
+
+    private void OnEnable()
+    {
+        if (hideWorldOrb)
+            gameObject.SetActive(false);
     }
 
     private void Update()

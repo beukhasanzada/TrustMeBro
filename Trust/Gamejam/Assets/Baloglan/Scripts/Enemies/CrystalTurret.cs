@@ -7,7 +7,7 @@ public sealed class CrystalTurret : MonoBehaviour
     static readonly int Idle = Animator.StringToHash("Base Layer.Idle");
     static readonly int Shoot = Animator.StringToHash("Base Layer.Shoot");
     static readonly int EmissionColor = Shader.PropertyToID("_EmissionColor");
-    const float FacingTolerance = 8f;
+    const float FacingTolerance = 14f;
     const float FlashDuration = 0.22f;
 
     [Header("Detection")]
@@ -19,6 +19,8 @@ public sealed class CrystalTurret : MonoBehaviour
     [Header("Attack")]
     [SerializeField, Min(0.1f)] float attackRange = 30f;
     [SerializeField, Min(0f)] float attackCooldown = 0.9f;
+    [SerializeField, Min(0.5f)] float fireRateMultiplier = 1.25f;
+    [SerializeField, Min(0.5f)] float aimSpeedMultiplier = 2.0f;
     [SerializeField, Min(0f)] float damage = 12f;
     [SerializeField, Min(0f)] float knockbackStrength = 8f;
     [SerializeField, Min(1f)] float turnSpeed = 420f;
@@ -78,7 +80,7 @@ public sealed class CrystalTurret : MonoBehaviour
         Quaternion desired = visible && direction.sqrMagnitude > 0.0001f
             ? Quaternion.LookRotation(direction, transform.up)
             : muzzle.rotation;
-        aimRotation = Quaternion.RotateTowards(aimRotation, desired, turnSpeed * Time.deltaTime);
+        aimRotation = Quaternion.RotateTowards(aimRotation, desired, turnSpeed * Mathf.Max(0.5f, aimSpeedMultiplier) * Time.deltaTime);
 
         animatedBarrelRotation = barrel.localRotation;
         barrel.rotation = aimRotation * Quaternion.Inverse(muzzle.rotation) * barrel.rotation;
@@ -110,6 +112,7 @@ public sealed class CrystalTurret : MonoBehaviour
         {
             attacking = true;
             shotFramePassed = false;
+            animator.speed = fireRateMultiplier;
             animator.Play(Shoot, 0, 0f);
         }
 
@@ -120,6 +123,7 @@ public sealed class CrystalTurret : MonoBehaviour
     {
         RestoreAnimatedPose();
         EndAttack();
+        if (animator != null) animator.speed = 1f;
         flashUntil = 0f;
         UpdateFlash();
     }
@@ -162,11 +166,15 @@ public sealed class CrystalTurret : MonoBehaviour
             return;
 
         if (shotFramePassed)
-            nextAttackAt = Time.time + attackCooldown;
+            nextAttackAt = Time.time + attackCooldown / Mathf.Max(0.5f, fireRateMultiplier);
 
         attacking = false;
-        if (animator.isActiveAndEnabled)
-            animator.Play(Idle, 0, 0f);
+        if (animator != null)
+        {
+            animator.speed = 1f;
+            if (animator.isActiveAndEnabled)
+                animator.Play(Idle, 0, 0f);
+        }
     }
 
     void RestoreAnimatedPose()

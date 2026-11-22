@@ -57,6 +57,7 @@ public sealed class WeaponController : MonoBehaviour
     [SerializeField] bool requireLockedCursorForMouse = true;
     [SerializeField] float fireIntervalMultiplier = 1f;
     [SerializeField] bool autoReload = true;
+    [SerializeField, Min(1f)] float bossHeadshotMultiplier = 1.5f;
 
     readonly RaycastHit[] hits = new RaycastHit[32];
     readonly WeaponItem[] slots = new WeaponItem[InventoryCapacity];
@@ -89,6 +90,7 @@ public sealed class WeaponController : MonoBehaviour
     public event Action<WeaponAmmoState> AmmoChanged;
     public event Action Fired;
     public event Action TargetHit;
+    public event Action<bool, bool> HitConfirmed;
 
     void Awake()
     {
@@ -364,11 +366,26 @@ public sealed class WeaponController : MonoBehaviour
         float spread = Mathf.Tan(definition.SpreadDegrees * Mathf.Deg2Rad);
         // The Animator can move enemy hitboxes between physics steps.
         Physics.SyncTransforms();
+        bool shotHit = false;
+        bool shotHeadshot = false;
+        bool shotKill = false;
         for (int i = 0; i < definition.PelletsPerShot; i++)
         {
             Vector2 offset = spread > 0f ? UnityEngine.Random.insideUnitCircle * spread : Vector2.zero;
             Vector3 direction = rotation * new Vector3(offset.x, offset.y, 1f).normalized;
-            ApplyHit(origin, direction, definition);
+            if (ApplyHit(origin, direction, definition, out bool isHeadshot, out bool isKill))
+            {
+                shotHit = true;
+                shotHeadshot |= isHeadshot;
+                shotKill |= isKill;
+            }
+        }
+
+        if (shotHit)
+        {
+            CombatFeelManager.TriggerHit(shotHeadshot, shotKill);
+            HitConfirmed?.Invoke(shotHeadshot, shotKill);
+            TargetHit?.Invoke();
         }
 
         if (definition.Type == WeaponType.Shotgun && fpsController != null)
@@ -443,35 +460,140 @@ public sealed class WeaponController : MonoBehaviour
         ApplyRecoilPose(default);
     }
 
-    void ApplyHit(Vector3 origin, Vector3 direction, WeaponDefinition definition)
+    bool ApplyHit(Vector3 origin, Vector3 direction, WeaponDefinition definition, out bool isHeadshot, out bool isKill)
     {
-        RaycastHit nearest = default;
-        float nearestDistance = definition.Range;
-        int count = Physics.RaycastNonAlloc(origin, direction, hits, nearestDistance, hitLayers,
+        isHeadshot = false;
+        isKill = false;
+
+        int count = Physics.RaycastNonAlloc(origin, direction, hits, definition.Range, hitLayers,
             QueryTriggerInteraction.Collide);
+
+        float nearestWallDist = definition.Range;
         for (int i = 0; i < count; i++)
         {
             RaycastHit hit = hits[i];
-            Collider collider = hit.collider;
-            if (hit.distance > nearestDistance || collider.transform.IsChildOf(transform)
-                || (collider.isTrigger && collider.gameObject.layer != enemyHitboxLayer))
+            Collider col = hit.collider;
+            if (col.transform.IsChildOf(transform) || col.isTrigger || col.GetComponentInParent<IWeaponDamageable>() != null)
                 continue;
 
-            nearest = hit;
-            nearestDistance = hit.distance;
+            if (hit.distance < nearestWallDist)
+                nearestWallDist = hit.distance;
         }
 
-        Collider target = nearest.collider;
-        if (target == null)
-            return;
+        IWeaponDamageable nearestTarget = null;
+        RaycastHit nearestHit = default;
+        float nearestDist = nearestWallDist;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = hits[i];
+            Collider col = hit.collider;
+            if (hit.distance > nearestDist || col.transform.IsChildOf(transform)
+                || (col.isTrigger && col.gameObject.layer != enemyHitboxLayer))
+                continue;
 
-        IWeaponDamageable damageable = target.GetComponentInParent<IWeaponDamageable>();
-        if (damageable == null)
-            return;
+            IWeaponDamageable candidate = col.GetComponentInParent<IWeaponDamageable>();
+            if (candidate == null)
+                continue;
 
-        target.GetComponentInParent<EnemyHitImpact>()?.PlayAt(nearest.point, nearest.normal);
-        damageable.TakeWeaponDamage(definition.DamagePerPellet);
-        TargetHit?.Invoke();
+            nearestTarget = candidate;
+            nearestHit = hit;
+            nearestDist = hit.distance;
+        }
+
+        if (nearestTarget == null)
+            return false;
+
+        // Inspect all hits on the winning enemy before any wall so inner trigger hitboxes (head Hitbox / Barrel Hitbox)
+        // are never masked by an outer enclosing CapsuleCollider.
+        RaycastHit chosenHit = nearestHit;
+        float bestHeadDist = nearestWallDist;
+        bool hasHeadChildHitbox = false;
+
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = hits[i];
+            Collider col = hit.collider;
+            if (hit.distance > nearestWallDist || col.transform.IsChildOf(transform)
+                || (col.isTrigger && col.gameObject.layer != enemyHitboxLayer))
+                continue;
+
+            if (!ReferenceEquals(col.GetComponentInParent<IWeaponDamageable>(), nearestTarget))
+                continue;
+
+            if (IsNamedHeadCollider(col))
+            {
+                hasHeadChildHitbox = true;
+                if (hit.distance <= bestHeadDist)
+                {
+                    bestHeadDist = hit.distance;
+                    chosenHit = hit;
+                    isHeadshot = true;
+                }
+            }
+        }
+
+        if (!isHeadshot && !hasHeadChildHitbox)
+        {
+            Collider hitCol = chosenHit.collider;
+            string hitName = hitCol.name.ToLowerInvariant();
+            bool isNamedNonHeadHitbox = hitName.Contains("body") || hitName.Contains("arm")
+                || hitName.Contains("leg") || hitName.Contains("base");
+            if (!isNamedNonHeadHitbox)
+            {
+                float topZone = hitCol is CapsuleCollider
+                    ? Mathf.Min(0.48f, hitCol.bounds.size.y * 0.32f)
+                    : hitCol.bounds.size.y * 0.32f;
+                if (chosenHit.point.y >= hitCol.bounds.max.y - topZone)
+                    isHeadshot = true;
+            }
+        }
+
+        Component targetComponent = nearestTarget as Component;
+        bool isBoss = IsBossTarget(targetComponent, nearestTarget);
+        bool wasAlive = IsTargetAlive(nearestTarget);
+
+        float damage = definition.DamagePerPellet;
+        if (isHeadshot)
+            damage = isBoss ? definition.DamagePerPellet * bossHeadshotMultiplier : 100000f;
+
+        chosenHit.collider.GetComponentInParent<EnemyHitImpact>()?.PlayAt(chosenHit.point, chosenHit.normal);
+        nearestTarget.TakeWeaponDamage(damage);
+        isKill = wasAlive && !IsTargetAlive(nearestTarget);
+        return true;
+    }
+
+    static bool IsNamedHeadCollider(Collider col)
+    {
+        string n = col.name;
+        return n.IndexOf("head", StringComparison.OrdinalIgnoreCase) >= 0
+            || n.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    static bool IsBossTarget(Component comp, IWeaponDamageable target)
+    {
+        if (target is BossOverseer)
+            return true;
+        if (target is Health h && h.MaxHealth >= 300f)
+            return true;
+        if (target is EnemyBase eb && eb.health >= 300)
+            return true;
+        if (comp != null)
+        {
+            string n = comp.gameObject.name;
+            if (n.IndexOf("boss", StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("supervisor", StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("overseer", StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+        }
+        return false;
+    }
+
+    static bool IsTargetAlive(IWeaponDamageable target)
+    {
+        if (target is Health h) return h.IsAlive;
+        if (target is EnemyBase eb) return eb.health > 0;
+        if (target is WeaponTestTarget wtt) return wtt.Health > 0f;
+        return false;
     }
 
     void PlaySfx(AudioClip clip)

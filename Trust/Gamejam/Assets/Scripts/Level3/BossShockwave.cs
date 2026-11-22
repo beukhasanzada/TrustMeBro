@@ -5,21 +5,22 @@ using UnityEngine;
 /// Phase 2+ ankle-height floor shockwave ring for the Overseer boss.
 /// Uses a LineRenderer circle + shadowless PointLight (zero Unity primitives).
 /// 1.0s telegraph -> expanding ring; player must jump or air-jump over it
-/// (hit applies slow + 1s time loss via PlayerHitReceiver.HitByRanged).
+/// (hit applies knockback + slow + hit vignette via PlayerHitReceiver without removing time).
 /// </summary>
 public sealed class BossShockwave : MonoBehaviour
 {
     [Header("Timing & Geometry")]
     [SerializeField, Min(0.1f)] private float telegraphSeconds = 1.0f;
     [SerializeField, Min(1f)] private float startRadius = 1.5f;
-    [SerializeField, Min(4f)] private float maxRadius = 22.0f;
-    [SerializeField, Min(1f)] private float expandSpeed = 16.0f;
-    [SerializeField, Min(0.1f)] private float ringThickness = 1.15f;
-    [SerializeField, Min(0.1f)] private float ringHeightOffset = 0.35f;
-    [SerializeField, Min(0.2f)] private float jumpClearanceHeight = 0.95f;
+    [SerializeField, Min(4f)] private float maxRadius = 28.0f;
+    [SerializeField, Min(1f)] private float expandSpeed = 16.5f;
+    [SerializeField, Min(0.1f)] private float ringThickness = 1.25f;
+    [SerializeField, Min(0.1f)] private float ringHeightOffset = 0.28f;
+    [SerializeField, Min(0.2f)] private float jumpClearanceHeight = 0.75f;
 
-    [Header("Penalty (via PlayerHitReceiver)")]
-    [SerializeField, Min(0f)] private float shockwaveTimePenalty = 1.0f;
+    [Header("Impact (via PlayerHitReceiver)")]
+    [SerializeField, Min(0f)] private float shockwaveTimePenalty = 0f;
+    [SerializeField, Min(0f)] private float shockwaveKnockback = 13f;
 
     [Header("Visuals")]
     [SerializeField] private LineRenderer ringRenderer;
@@ -27,45 +28,106 @@ public sealed class BossShockwave : MonoBehaviour
     [SerializeField] private Color telegraphColor = new Color(1f, 0.72f, 0.15f, 0.9f);
     [SerializeField] private Color activeColor = new Color(1f, 0.22f, 0.18f, 1f);
 
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
     private const int Segments = 48;
     private readonly Vector3[] points = new Vector3[Segments + 1];
     private Transform playerTransform;
+    private Collider playerCollider;
     private PlayerHitReceiver playerHitReceiver;
+    private Material ringMaterial;
+    private Coroutine waveRoutine;
     private bool activeWave;
 
     private void Awake()
     {
         if (ringRenderer == null)
-        {
             ringRenderer = gameObject.AddComponent<LineRenderer>();
-            ringRenderer.useWorldSpace = true;
-            ringRenderer.loop = true;
-            ringRenderer.positionCount = Segments + 1;
-            ringRenderer.numCapVertices = 2;
-            Shader s = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Sprites/Default");
-            if (s != null) ringRenderer.material = new Material(s);
+
+        ringRenderer.useWorldSpace = true;
+        ringRenderer.loop = true;
+        ringRenderer.positionCount = Segments + 1;
+        ringRenderer.numCapVertices = 2;
+        ringRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        ringRenderer.receiveShadows = false;
+
+        Shader s = Shader.Find("Universal Render Pipeline/Particles/Unlit")
+            ?? Shader.Find("Sprites/Default")
+            ?? Shader.Find("Universal Render Pipeline/Unlit");
+        if (s != null)
+        {
+            ringMaterial = new Material(s);
+            ringRenderer.material = ringMaterial;
         }
+
         ringRenderer.enabled = false;
         if (pulseLight != null) pulseLight.enabled = false;
 
-        RigidbodyFpsController fps = FindFirstObjectByType<RigidbodyFpsController>();
-        if (fps != null)
-        {
-            playerTransform = fps.transform;
-            playerHitReceiver = fps.GetComponentInChildren<PlayerHitReceiver>();
-        }
+        ResolvePlayer();
+    }
+
+    private void OnDestroy()
+    {
+        if (ringMaterial != null)
+            Destroy(ringMaterial);
+    }
+
+    private void OnDisable()
+    {
+        StopShockwave();
     }
 
     public void TriggerShockwave(Vector3 floorOrigin)
     {
         if (activeWave) return;
-        StartCoroutine(ShockwaveRoutine(floorOrigin));
+        waveRoutine = StartCoroutine(ShockwaveRoutine(floorOrigin));
+    }
+
+    public void StopShockwave()
+    {
+        if (waveRoutine != null)
+        {
+            StopCoroutine(waveRoutine);
+            waveRoutine = null;
+        }
+        if (ringRenderer != null) ringRenderer.enabled = false;
+        if (pulseLight != null) pulseLight.enabled = false;
+        activeWave = false;
+    }
+
+    private void ResolvePlayer()
+    {
+        if (playerTransform != null) return;
+        RigidbodyFpsController fps = FindFirstObjectByType<RigidbodyFpsController>();
+        if (fps != null)
+        {
+            playerTransform = fps.transform;
+            playerCollider = fps.GetComponent<Collider>();
+            playerHitReceiver = fps.GetComponentInChildren<PlayerHitReceiver>();
+        }
+    }
+
+    private void ApplyRingColor(Color c)
+    {
+        if (ringRenderer != null)
+        {
+            ringRenderer.startColor = c;
+            ringRenderer.endColor = c;
+        }
+        if (ringMaterial != null)
+        {
+            ringMaterial.color = c;
+            if (ringMaterial.HasProperty(BaseColorId))
+                ringMaterial.SetColor(BaseColorId, c);
+        }
     }
 
     private IEnumerator ShockwaveRoutine(Vector3 floorOrigin)
     {
         activeWave = true;
+        ResolvePlayer();
         ringRenderer.enabled = true;
+
         if (pulseLight != null)
         {
             pulseLight.transform.position = floorOrigin + Vector3.up * 0.6f;
@@ -74,10 +136,9 @@ public sealed class BossShockwave : MonoBehaviour
         }
 
         // 1.0s Telegraph
-        ringRenderer.startWidth = 0.16f;
-        ringRenderer.endWidth = 0.16f;
-        ringRenderer.startColor = telegraphColor;
-        ringRenderer.endColor = telegraphColor;
+        ringRenderer.startWidth = 0.22f;
+        ringRenderer.endWidth = 0.22f;
+        ApplyRingColor(telegraphColor);
 
         float elapsed = 0f;
         while (elapsed < telegraphSeconds)
@@ -91,10 +152,9 @@ public sealed class BossShockwave : MonoBehaviour
         }
 
         // Expanding ankle-height shockwave
-        ringRenderer.startWidth = 0.34f;
-        ringRenderer.endWidth = 0.34f;
-        ringRenderer.startColor = activeColor;
-        ringRenderer.endColor = activeColor;
+        ringRenderer.startWidth = 0.48f;
+        ringRenderer.endWidth = 0.48f;
+        ApplyRingColor(activeColor);
         if (pulseLight != null) pulseLight.color = activeColor;
 
         float radius = startRadius;
@@ -102,6 +162,7 @@ public sealed class BossShockwave : MonoBehaviour
 
         while (radius <= maxRadius)
         {
+            float prevRadius = radius;
             radius += expandSpeed * Time.deltaTime;
             UpdateCircle(floorOrigin + Vector3.up * ringHeightOffset, radius);
 
@@ -109,15 +170,18 @@ public sealed class BossShockwave : MonoBehaviour
             {
                 Vector3 delta = playerTransform.position - floorOrigin;
                 float horizDist = new Vector2(delta.x, delta.z).magnitude;
-                float heightAboveFloor = delta.y;
+                float feetY = playerCollider != null ? playerCollider.bounds.min.y : playerTransform.position.y - 1.0f;
+                float heightAboveFloor = feetY - floorOrigin.y;
 
-                if (Mathf.Abs(horizDist - radius) <= ringThickness && heightAboveFloor < jumpClearanceHeight)
+                bool inRingBand = horizDist >= prevRadius - ringThickness * 0.65f
+                    && horizDist <= radius + ringThickness * 0.65f;
+                bool belowClearance = heightAboveFloor >= -1.0f && heightAboveFloor < jumpClearanceHeight;
+
+                if (inRingBand && belowClearance && playerHitReceiver != null)
                 {
                     hitThisWave = true;
-                    if (playerHitReceiver != null)
-                        playerHitReceiver.HitByRanged(shockwaveTimePenalty);
-                    else if (TimeManager.Instance != null && shockwaveTimePenalty > 0f)
-                        TimeManager.Instance.RemoveTime(shockwaveTimePenalty);
+                    playerHitReceiver.HitByTurret(floorOrigin, shockwaveKnockback);
+                    playerHitReceiver.HitByRanged(0f);
                 }
             }
 
@@ -127,6 +191,7 @@ public sealed class BossShockwave : MonoBehaviour
         ringRenderer.enabled = false;
         if (pulseLight != null) pulseLight.enabled = false;
         activeWave = false;
+        waveRoutine = null;
     }
 
     private void UpdateCircle(Vector3 center, float radius)

@@ -15,6 +15,7 @@ public class SlowDrone : EnemyBase
     [Header("Slow Orb Attack")]
     public SlowOrb slowOrbPrefab;
     public float fireCooldown = 2.5f;
+    [SerializeField, Min(0.5f)] public float fireRateMultiplier = 1.25f;
     public float orbSpeed = 11f;
     public float slowMultiplier = 0.55f;
     public float slowDuration = 2f;
@@ -30,7 +31,7 @@ public class SlowDrone : EnemyBase
         base.Awake();
         baseY = transform.position.y;
         hoverOffset = Random.Range(0f, Mathf.PI * 2f);
-        fireTimer = fireCooldown * 0.5f;
+        fireTimer = (fireCooldown / Mathf.Max(0.5f, fireRateMultiplier)) * 0.5f;
     }
 
     private void Start()
@@ -63,7 +64,7 @@ public class SlowDrone : EnemyBase
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 Quaternion.LookRotation(flatDir),
-                8f * Time.deltaTime
+                16f * Time.deltaTime
             );
 
             // Maintain preferred distance
@@ -77,7 +78,7 @@ public class SlowDrone : EnemyBase
             fireTimer -= Time.deltaTime;
             if (fireTimer <= 0f)
             {
-                fireTimer = fireCooldown;
+                fireTimer = fireCooldown / Mathf.Max(0.5f, fireRateMultiplier);
                 FireOrb();
             }
         }
@@ -94,6 +95,6 @@ public class SlowDrone : EnemyBase
         Vector3 dir = (targetPos - spawnPos).normalized;
 
         SlowOrb orb = Instantiate(slowOrbPrefab, spawnPos, Quaternion.LookRotation(dir));
-        orb.Launch(dir, orbSpeed, slowMultiplier, slowDuration);
+        orb.Launch(dir, orbSpeed * 1.15f, slowMultiplier, slowDuration);
     }
 }

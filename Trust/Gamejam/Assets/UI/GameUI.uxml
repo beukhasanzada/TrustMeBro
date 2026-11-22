@@ -16,6 +16,7 @@
                     <ui:VisualElement name="time-fill" picking-mode="Ignore" class="time-fill retro-meter-gloss"/>
                     <ui:VisualElement name="time-cap-notch" picking-mode="Ignore" class="time-cap-notch"/>
                 </ui:VisualElement>
+                <ui:Label name="activity-cue" text="" picking-mode="Ignore" class="activity-cue hidden-display"/>
                 <ui:Label name="slow-chip" text="SLOWED" picking-mode="Ignore" class="slow-chip"/>
                 <ui:VisualElement name="boss-bar-wrapper" picking-mode="Ignore" class="boss-bar-wrapper hidden-display">
                     <ui:Label name="boss-bar-label" text="BOSS" picking-mode="Ignore" class="micro-label boss-bar-label"/>
@@ -23,6 +24,10 @@
                         <ui:VisualElement name="boss-bar-fill" picking-mode="Ignore" class="boss-bar-fill"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="crystal-counter" picking-mode="Ignore" class="crystal-counter retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="crystal-gem-icon"/>
+                <ui:Label name="crystal-count" text="0" picking-mode="Ignore" class="crystal-count"/>
             </ui:VisualElement>
             <ui:VisualElement name="buff-list" picking-mode="Ignore" class="buff-list"/>
             <ui:VisualElement name="crosshair" picking-mode="Ignore" class="crosshair">
@@ -120,6 +125,18 @@
                             </ui:VisualElement>
                             <ui:Slider name="slider-volume" low-value="0" high-value="1" value="1" class="settings-slider"/>
                         </ui:VisualElement>
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Menu music" class="micro-label"/>
+                            </ui:VisualElement>
+                            <ui:DropdownField name="dropdown-menu-music" class="settings-dropdown"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="settings-row">
+                            <ui:VisualElement class="settings-row-header">
+                                <ui:Label text="Level music" class="micro-label"/>
+                            </ui:VisualElement>
+                            <ui:DropdownField name="dropdown-level-music" class="settings-dropdown"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Button name="btn-settings-back" text="Back" class="ui-button retro-button retro-button--primary"/>
                 </ui:VisualElement>
@@ -132,7 +149,7 @@
                     <ui:Label text="Out of time" picking-mode="Ignore" class="retro-title"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="window-body">
-                    <ui:Label text="Retry starts the level over." class="dialog-status dialog-status--danger"/>
+                    <ui:Label name="death-reason" text="Retry starts the level over." class="dialog-status dialog-status--danger"/>
                     <ui:VisualElement class="button-row">
                         <ui:Button name="btn-retry" text="Retry level" class="ui-button retro-button retro-button--primary"/>
                         <ui:Button name="btn-death-mainmenu" text="Main menu" class="ui-button retro-button"/>

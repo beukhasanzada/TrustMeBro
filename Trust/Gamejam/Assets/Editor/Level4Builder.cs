@@ -518,7 +518,7 @@ public static class Level4Builder
         pCol.size = new Vector3(4.0f, 4.2f, 2.5f);
         PortalTrigger pt = exitRoot.AddComponent<PortalTrigger>();
         SerializedObject soPt = new SerializedObject(pt);
-        soPt.FindProperty("targetScene").stringValue = "SampleScene";
+        soPt.FindProperty("targetScene").stringValue = "EndingLevel";
         soPt.FindProperty("loadingSceneName").stringValue = "Loading";
         soPt.FindProperty("playerTag").stringValue = "Player";
         soPt.ApplyModifiedPropertiesWithoutUndo();

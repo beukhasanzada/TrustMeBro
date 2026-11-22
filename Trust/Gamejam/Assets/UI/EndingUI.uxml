@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/RetroChrome.uss"/>
+    <Style src="project://database/Assets/UI/EndingUI.uss"/>
+    <ui:VisualElement name="ending-root" picking-mode="Ignore" class="ending-root">
+        <ui:VisualElement name="eyelid-top" picking-mode="Ignore" class="eyelid eyelid--top"/>
+        <ui:VisualElement name="eyelid-bottom" picking-mode="Ignore" class="eyelid eyelid--bottom"/>
+        <ui:VisualElement name="fade-curtain" picking-mode="Ignore" class="fade-curtain"/>
+        <ui:Label name="ending-caption" text="" picking-mode="Ignore" class="ending-caption ending-caption--hidden"/>
+        <ui:Label name="skip-hint" text="Space · Skip" picking-mode="Ignore" class="skip-hint"/>
+        <ui:VisualElement name="ending-card-root" picking-mode="Ignore" class="screen ending-overlay screen--hidden">
+            <ui:VisualElement class="ending-card retro-frame">
+                <ui:VisualElement picking-mode="Ignore" class="retro-titlebar window-titlebar">
+                    <ui:VisualElement picking-mode="Ignore" class="retro-app-icon"/>
+                    <ui:Label text="Morning Shift" picking-mode="Ignore" class="retro-title"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="ending-body">
+                    <ui:Label text="THE END" picking-mode="Ignore" class="ending-heading"/>
+                    <ui:Label name="ending-subtitle" text="You wake up at your desk. The chaos was only a dream." picking-mode="Ignore" class="ending-subtitle"/>
+                    <ui:Label name="ending-crystals" text="" picking-mode="Ignore" class="ending-crystals hidden-display"/>
+                    <ui:VisualElement class="button-row ending-actions">
+                        <ui:Button name="btn-ending-menu" text="Main menu" class="ui-button retro-button retro-button--primary"/>
+                        <ui:Button name="btn-ending-quit" text="Quit" class="ui-button retro-button"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

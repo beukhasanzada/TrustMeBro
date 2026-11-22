@@ -14,8 +14,9 @@ public class HUDController : MonoBehaviour
     [SerializeField] private TimeManager timeManager;
 
     [Header("Time Bar Tuning")]
-    [SerializeField, Range(0.05f, 0.5f)] private float lowTimeThreshold = 0.25f;
+    [SerializeField, Range(0.05f, 0.5f)] private float lowTimeThreshold = 0.33f;
     [SerializeField, Range(0.02f, 0.25f)] private float criticalTimeThreshold = 0.10f;
+    [SerializeField, Range(0.1f, 0.9f)] private float cueShowThreshold = 0.50f;
     [SerializeField] private float trailDelay = 0.28f;
     [SerializeField] private float trailCatchupSpeed = 0.65f;
     [SerializeField] private float gainLerpSpeed = 8f;
@@ -35,6 +36,7 @@ public class HUDController : MonoBehaviour
     private VisualElement timeFill;
     private VisualElement timeTrail;
     private Label timeGainChevron;
+    private Label activityCueLabel;
     private VisualElement dangerVignette;
     private VisualElement slowVignette;
     private Label slowChip;
@@ -51,6 +53,8 @@ public class HUDController : MonoBehaviour
     private Label reloadHintLabel;
     private VisualElement crosshair;
     private VisualElement hitMarker;
+    private VisualElement crystalCounter;
+    private Label crystalCountLabel;
 
     private float targetNormalized = 1f;
     private float displayNormalized = 1f;
@@ -71,6 +75,7 @@ public class HUDController : MonoBehaviour
     private IVisualElementScheduledItem punchResetSchedule;
     private IVisualElementScheduledItem fireResetSchedule;
     private IVisualElementScheduledItem hitResetSchedule;
+    private IVisualElementScheduledItem crystalPopSchedule;
 
     public void Initialize(VisualElement root, WeaponController weapon, PlayerSlow slow, TimeManager manager)
     {
@@ -83,6 +88,7 @@ public class HUDController : MonoBehaviour
         timeFill = root.Q<VisualElement>("time-fill");
         timeTrail = root.Q<VisualElement>("time-trail");
         timeGainChevron = root.Q<Label>("time-gain-chevron");
+        activityCueLabel = root.Q<Label>("activity-cue");
         dangerVignette = root.Q<VisualElement>("danger-vignette");
         slowVignette = root.Q<VisualElement>("slow-vignette");
         slowChip = root.Q<Label>("slow-chip");
@@ -98,6 +104,8 @@ public class HUDController : MonoBehaviour
         reloadHintLabel = root.Q<Label>("reload-hint");
         crosshair = root.Q<VisualElement>("crosshair");
         hitMarker = root.Q<VisualElement>("hit-marker");
+        crystalCounter = root.Q<VisualElement>("crystal-counter");
+        crystalCountLabel = root.Q<Label>("crystal-count");
 
         ammoPips.Clear();
         VisualElement pipsContainer = root.Q<VisualElement>("ammo-pips");
@@ -125,8 +133,8 @@ public class HUDController : MonoBehaviour
             weaponController.AmmoChanged += HandleAmmoChanged;
             weaponController.Fired -= HandleWeaponFired;
             weaponController.Fired += HandleWeaponFired;
-            weaponController.TargetHit -= HandleTargetHit;
-            weaponController.TargetHit += HandleTargetHit;
+            weaponController.HitConfirmed -= HandleHitConfirmed;
+            weaponController.HitConfirmed += HandleHitConfirmed;
             HandleAmmoChanged(weaponController.Ammo);
         }
 
@@ -151,6 +159,12 @@ public class HUDController : MonoBehaviour
             cameraRig.AimChanged += SetCrosshairAiming;
             SetCrosshairAiming(cameraRig.IsAiming);
         }
+
+        CrystalCurrencyManager.EnsureCreated();
+        CrystalCurrencyManager.OnCrystalsChanged -= HandleCrystalsChanged;
+        CrystalCurrencyManager.OnCrystalsChanged += HandleCrystalsChanged;
+        if (crystalCountLabel != null)
+            crystalCountLabel.text = CrystalCurrencyManager.TotalCrystals.ToString();
     }
 
     private void Start()
@@ -163,6 +177,7 @@ public class HUDController : MonoBehaviour
         if (timeManager == null) return;
         targetNormalized = displayNormalized = trailNormalized = timeManager.Normalized;
         ApplyTimeBarWidths();
+        UpdateActivityCue();
     }
 
     private void OnDestroy()
@@ -172,11 +187,12 @@ public class HUDController : MonoBehaviour
         {
             weaponController.AmmoChanged -= HandleAmmoChanged;
             weaponController.Fired -= HandleWeaponFired;
-            weaponController.TargetHit -= HandleTargetHit;
+            weaponController.HitConfirmed -= HandleHitConfirmed;
         }
         if (playerSlow != null) playerSlow.OnSlowStateChanged -= HandleSlowChanged;
         if (hitReceiver != null) hitReceiver.OnRangedHitFeedback -= HandleRangedHitVignette;
         if (cameraRig != null) cameraRig.AimChanged -= SetCrosshairAiming;
+        CrystalCurrencyManager.OnCrystalsChanged -= HandleCrystalsChanged;
     }
 
     private void Update()
@@ -194,8 +210,10 @@ public class HUDController : MonoBehaviour
 
         if (delta > 0f)
         {
+            displayNormalized = targetNormalized;
+            trailNormalized = targetNormalized;
+            ApplyTimeBarWidths();
             TriggerTimeGainFeedback();
-            trailNormalized = Mathf.Max(trailNormalized, targetNormalized);
         }
         else if (delta <= -hazardShakeMinLoss)
         {
@@ -231,6 +249,7 @@ public class HUDController : MonoBehaviour
         }
 
         ApplyTimeBarWidths();
+        UpdateActivityCue();
 
         bool isLow = targetNormalized <= lowTimeThreshold && targetNormalized > 0f;
         bool isCritical = targetNormalized <= criticalTimeThreshold && targetNormalized > 0f;
@@ -275,6 +294,15 @@ public class HUDController : MonoBehaviour
     {
         if (timeFill != null) timeFill.style.width = Length.Percent(displayNormalized * 100f);
         if (timeTrail != null) timeTrail.style.width = Length.Percent(trailNormalized * 100f);
+    }
+
+    private void UpdateActivityCue()
+    {
+        if (activityCueLabel == null) return;
+        bool showCue = timeManager != null && targetNormalized < cueShowThreshold && targetNormalized > 0f;
+        activityCueLabel.EnableInClassList("hidden-display", !showCue);
+        if (showCue)
+            activityCueLabel.text = timeManager.LowerCueLabel;
     }
 
     private void TriggerTimeLossFlash()
@@ -363,15 +391,36 @@ public class HUDController : MonoBehaviour
         }
     }
 
-    private void HandleTargetHit()
+    private void HandleHitConfirmed(bool isHeadshot, bool isKill)
     {
         if (hitMarker == null) return;
+        hitMarker.EnableInClassList("hit-marker--headshot", isHeadshot);
+        hitMarker.EnableInClassList("hit-marker--kill", isKill && !isHeadshot);
         hitMarker.AddToClassList("hit-marker--show");
+        int duration = isHeadshot ? hitMarkerMs + 90 : isKill ? hitMarkerMs + 50 : hitMarkerMs;
         hitResetSchedule?.Pause();
         hitResetSchedule = hitMarker.schedule.Execute(() =>
         {
             hitMarker.RemoveFromClassList("hit-marker--show");
-        }).StartingIn(hitMarkerMs);
+            hitMarker.RemoveFromClassList("hit-marker--headshot");
+            hitMarker.RemoveFromClassList("hit-marker--kill");
+        }).StartingIn(duration);
+    }
+
+    private void HandleCrystalsChanged(int total, int delta)
+    {
+        if (crystalCountLabel != null)
+            crystalCountLabel.text = total.ToString();
+
+        if (crystalCounter == null || delta <= 0)
+            return;
+
+        crystalCounter.AddToClassList("crystal-counter--pop");
+        crystalPopSchedule?.Pause();
+        crystalPopSchedule = crystalCounter.schedule.Execute(() =>
+        {
+            crystalCounter.RemoveFromClassList("crystal-counter--pop");
+        }).StartingIn(150);
     }
 
     private void UpdateReloadAndEmptyPulse(float dt)

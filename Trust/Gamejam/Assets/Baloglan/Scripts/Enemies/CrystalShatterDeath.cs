@@ -30,6 +30,9 @@ public sealed class CrystalShatterDeath : MonoBehaviour
     void Shatter()
     {
         Vector3 origin = crystalRenderer != null ? crystalRenderer.bounds.center : transform.position;
+        bool isBoss = health != null && health.MaxHealth >= 300f;
+        CrystalCurrencyManager.SpawnDropsForTransform(transform, origin, isBoss ? 14 : 4, isBoss);
+
         if (deathVfx != null)
             Destroy(Instantiate(deathVfx, origin, Quaternion.identity), 4f);
 

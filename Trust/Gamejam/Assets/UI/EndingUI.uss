@@ -1,0 +1,145 @@
+.ending-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.eyelid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background-color: #04060b;
+}
+
+.eyelid--top {
+    top: 0;
+}
+
+.eyelid--bottom {
+    bottom: 0;
+}
+
+.fade-curtain {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #030408;
+    opacity: 1;
+}
+
+.ending-caption {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 52px;
+    font-size: 18px;
+    color: #f4f6fb;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 420ms;
+}
+
+.ending-caption--hidden {
+    opacity: 0;
+}
+
+.skip-hint {
+    position: absolute;
+    right: 24px;
+    bottom: 20px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.72);
+    letter-spacing: 0.6px;
+}
+
+.ending-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(16, 28, 52, 0.42);
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: 480ms, 480ms;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.screen--hidden {
+    opacity: 0;
+    translate: 0 14px;
+    visibility: hidden;
+}
+
+.hidden-display {
+    display: none;
+}
+
+.ending-card {
+    width: 440px;
+    max-width: 92%;
+}
+
+.window-titlebar {
+    min-height: 34px;
+    padding-left: 11px;
+}
+
+.window-titlebar .retro-title {
+    font-size: 16px;
+}
+
+.ending-body {
+    padding: 24px 26px 22px 26px;
+}
+
+.ending-heading {
+    font-size: 32px;
+    color: #172a50;
+    -unity-font-style: bold;
+    margin: 0 0 8px 0;
+    -unity-text-align: middle-center;
+}
+
+.ending-subtitle {
+    font-size: 14px;
+    color: #364b70;
+    white-space: normal;
+    margin: 0 0 14px 0;
+    -unity-text-align: middle-center;
+}
+
+.ending-crystals {
+    font-size: 13px;
+    color: #1b6588;
+    -unity-font-style: bold;
+    margin: 0 0 16px 0;
+    -unity-text-align: middle-center;
+}
+
+.button-row {
+    flex-direction: row;
+}
+
+.ui-button {
+    min-height: 38px;
+    font-size: 14px;
+}
+
+.button-row .ui-button {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+}

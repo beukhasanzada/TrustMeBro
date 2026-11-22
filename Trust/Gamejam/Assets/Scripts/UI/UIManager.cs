@@ -58,6 +58,9 @@ public class UIManager : MonoBehaviour
     private Label escapeLine1;
     private Label escapeLine2;
     private VisualElement escapeActions;
+    private DropdownField dropdownMenuMusic;
+    private DropdownField dropdownLevelMusic;
+    private Label deathReasonLabel;
 
     private ScreenState state = ScreenState.Playing;
     private Coroutine escapeRoutine;
@@ -94,6 +97,7 @@ public class UIManager : MonoBehaviour
         escapeLine1 = root.Q<Label>("escape-line-1");
         escapeLine2 = root.Q<Label>("escape-line-2");
         escapeActions = root.Q<VisualElement>("escape-actions");
+        deathReasonLabel = root.Q<Label>("death-reason");
 
         // Pause buttons
         btnResume = root.Q<Button>("btn-resume");
@@ -163,6 +167,12 @@ public class UIManager : MonoBehaviour
     {
         if (state == ScreenState.Dead || state == ScreenState.Escaped) return;
 
+        if (deathReasonLabel != null)
+            deathReasonLabel.text = !string.IsNullOrEmpty(timeManager?.LoseReason)
+                ? timeManager.LoseReason
+                : "Retry starts the level over.";
+
+        CombatFeelManager.CancelSlowmo();
         Time.timeScale = 0f;
         timeManager?.StopTimer();
         pauseController.SetGameplayControlActive(false);
@@ -174,6 +184,7 @@ public class UIManager : MonoBehaviour
     {
         if (state == ScreenState.Escaped) return;
 
+        CombatFeelManager.CancelSlowmo();
         Time.timeScale = 0f;
         timeManager?.StopTimer();
         pauseController.SetGameplayControlActive(false);
@@ -221,6 +232,8 @@ public class UIManager : MonoBehaviour
         valAimSens = root.Q<Label>("val-aim-sens");
         valFov = root.Q<Label>("val-fov");
         valVolume = root.Q<Label>("val-volume");
+        dropdownMenuMusic = root.Q<DropdownField>("dropdown-menu-music");
+        dropdownLevelMusic = root.Q<DropdownField>("dropdown-level-music");
 
         if (sliderMouseSens != null)
             sliderMouseSens.RegisterValueChangedCallback(e =>
@@ -250,6 +263,12 @@ public class UIManager : MonoBehaviour
                 if (valVolume != null) valVolume.text = $"{Mathf.RoundToInt(GameSettings.MasterVolume * 100f)}%";
             });
 
+        if (dropdownMenuMusic != null)
+            dropdownMenuMusic.RegisterValueChangedCallback(e => MusicManager.EnsureCreated().SetMenuTrackChoice(e.newValue));
+
+        if (dropdownLevelMusic != null)
+            dropdownLevelMusic.RegisterValueChangedCallback(e => MusicManager.EnsureCreated().SetLevelTrackChoice(e.newValue));
+
         btnSettingsBack = root.Q<Button>("btn-settings-back");
         if (btnSettingsBack != null) btnSettingsBack.clicked += CloseSettings;
 
@@ -268,6 +287,19 @@ public class UIManager : MonoBehaviour
         if (valAimSens != null) valAimSens.text = $"{GameSettings.AimSensitivityMultiplier:0.00}x";
         if (valFov != null) valFov.text = $"{Mathf.RoundToInt(GameSettings.Fov)}";
         if (valVolume != null) valVolume.text = $"{Mathf.RoundToInt(GameSettings.MasterVolume * 100f)}%";
+
+        MusicManager music = MusicManager.EnsureCreated();
+        if (dropdownMenuMusic != null)
+        {
+            dropdownMenuMusic.choices = music.GetDropdownChoices();
+            dropdownMenuMusic.SetValueWithoutNotify(music.SelectedMenuChoice);
+        }
+
+        if (dropdownLevelMusic != null)
+        {
+            dropdownLevelMusic.choices = music.GetDropdownChoices();
+            dropdownLevelMusic.SetValueWithoutNotify(music.SelectedLevelChoice);
+        }
     }
 
     private void SetState(ScreenState newState)

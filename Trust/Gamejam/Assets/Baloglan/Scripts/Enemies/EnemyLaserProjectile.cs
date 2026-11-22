@@ -3,7 +3,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class EnemyLaserProjectile : MonoBehaviour
 {
-    [SerializeField, Min(1f)] float speed = 34f;
+    [SerializeField, Min(1f)] float speed = 40f;
     [SerializeField, Min(0.01f)] float radius = 0.055f;
     [SerializeField, Min(0.1f)] float lifetime = 2f;
 

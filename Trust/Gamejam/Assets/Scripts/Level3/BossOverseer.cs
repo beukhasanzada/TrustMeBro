@@ -26,20 +26,20 @@ public sealed class BossOverseer : EnemyBase
     [Header("Hover Motion")]
     [SerializeField, Min(0f)] private float hoverAmplitude = 0.55f;
     [SerializeField, Min(0.1f)] private float hoverFrequency = 1.4f;
-    [SerializeField, Min(0f)] private float turnSpeed = 4.5f;
+    [SerializeField, Min(0f)] private float turnSpeed = 10f;
 
     [Header("Phase Thresholds")]
-    [SerializeField, Range(0.1f, 0.95f)] private float phase2Threshold = 0.66f;
+    [SerializeField, Range(0.1f, 0.95f)] private float phase2Threshold = 0.72f;
     [SerializeField, Range(0.05f, 0.90f)] private float phase3Threshold = 0.33f;
 
     [Header("Projectile Volley (reuses Ranged slow/penalty)")]
-    [SerializeField, Min(0.4f)] private float volleyInterval = 2.6f;
+    [SerializeField, Min(0.4f)] private float volleyInterval = 2.05f;
     [SerializeField, Min(1)] private int volleyCount = 3;
     [SerializeField, Min(0.02f)] private float volleySpreadAngle = 9f;
     [SerializeField, Min(0f)] private float projectileTimePenalty = 0.5f;
 
     [Header("Shockwave (Phase 2+)")]
-    [SerializeField, Min(2f)] private float shockwaveInterval = 8.0f;
+    [SerializeField, Min(2f)] private float shockwaveInterval = 6.5f;
     [SerializeField] private Transform shockwaveFloorOrigin;
 
     [Header("Enrage at Minion Cap")]
@@ -76,6 +76,9 @@ public sealed class BossOverseer : EnemyBase
 
         for (int i = 0; i < phase3Turrets.Length; i++)
             if (phase3Turrets[i] != null) phase3Turrets[i].SetActive(false);
+
+        if (shockwave == null)
+            shockwave = FindFirstObjectByType<BossShockwave>();
 
         RigidbodyFpsController fps = FindFirstObjectByType<RigidbodyFpsController>();
         if (fps != null) playerTransform = fps.transform;
@@ -144,13 +147,15 @@ public sealed class BossOverseer : EnemyBase
                 ? shockwaveFloorOrigin.position
                 : new Vector3(transform.position.x, transform.position.y - 2.4f, transform.position.z);
             shockwave.TriggerShockwave(floorPos);
-            nextShockwaveAt = Time.time + shockwaveInterval;
+            float interval = currentPhase >= 3 ? shockwaveInterval * 0.8f : shockwaveInterval;
+            nextShockwaveAt = Time.time + interval;
         }
     }
 
     public override void TakeHit(int damage)
     {
         if (isDead || damage <= 0) return;
+        if (!encounterActive) ActivateEncounter();
 
         int finalDamage = isEnraged
             ? Mathf.Max(1, Mathf.RoundToInt(damage * damageMultiplierAtCap))
@@ -170,7 +175,7 @@ public sealed class BossOverseer : EnemyBase
         {
             currentPhase = 2;
             if (minionSpawner != null) minionSpawner.SetPhase(2);
-            nextShockwaveAt = Time.time + 1.5f;
+            nextShockwaveAt = Time.time + 1.0f;
             OnPhaseChanged?.Invoke(2);
         }
 
@@ -215,6 +220,7 @@ public sealed class BossOverseer : EnemyBase
         if (isDead) return;
         encounterActive = false;
 
+        shockwave?.StopShockwave();
         if (shieldVisual != null) shieldVisual.SetActive(false);
         if (minionSpawner != null) minionSpawner.StopAndVanishAll();
 

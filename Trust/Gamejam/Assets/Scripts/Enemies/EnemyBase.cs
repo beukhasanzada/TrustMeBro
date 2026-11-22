@@ -52,6 +52,12 @@ public abstract class EnemyBase : MonoBehaviour, IWeaponDamageable
             col.enabled = false;
 
         TimeManager.Instance?.AddTime(secondsReward);
+        bool isBoss = this is BossOverseer;
+        CrystalCurrencyManager.SpawnDropsForTransform(
+            transform,
+            transform.position + Vector3.up * 0.7f,
+            isBoss ? 18 : 4,
+            isBoss);
         OnDeathEffect();
         StartCoroutine(DeathScaleRoutine());
     }

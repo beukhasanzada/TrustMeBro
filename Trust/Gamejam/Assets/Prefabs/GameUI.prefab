@@ -75,6 +75,8 @@ MonoBehaviour:
   maxTime: 90
   drainRate: 1
   isRunning: 1
+  stillTimeLimit: 4
+  jumpTimeLimit: 3
 --- !u!114 &1000000000000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,7 +92,7 @@ MonoBehaviour:
   weaponController: {fileID: 0}
   playerSlow: {fileID: 0}
   timeManager: {fileID: 1000000000000000007}
-  lowTimeThreshold: 0.25
+  lowTimeThreshold: 0.33
   criticalTimeThreshold: 0.1
   trailDelay: 0.28
   trailCatchupSpeed: 0.65

@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89efd9ef83134cc59883370ff708beb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyLaserProjectile
-  speed: 34
+  speed: 40
   radius: 0.055
   lifetime: 2
 --- !u!1 &5121906763700031536

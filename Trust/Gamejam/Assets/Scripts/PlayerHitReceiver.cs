@@ -17,6 +17,7 @@ public class PlayerHitReceiver : MonoBehaviour
     [Header("Hit Cooldown")]
     [Tooltip("Prevents a single projectile or burst from counting twice in the same instant.")]
     [SerializeField, Min(0f)] private float hitCooldown = 0.15f;
+    [SerializeField] private bool removeTimeOnHit = false;
 
     [Header("Hit Slow (Refreshing, Non-Stacking)")]
     [SerializeField, Range(0.1f, 1f)] private float hitSlowMultiplier = 0.55f;
@@ -55,7 +56,7 @@ public class PlayerHitReceiver : MonoBehaviour
 
         lastRangedHitAt = Time.time;
 
-        if (timePenaltySeconds > 0f)
+        if (removeTimeOnHit && timePenaltySeconds > 0f)
             TimeManager.Instance?.RemoveTime(timePenaltySeconds);
 
         if (hitSlowDuration > 0f && hitSlowMultiplier < 1f)

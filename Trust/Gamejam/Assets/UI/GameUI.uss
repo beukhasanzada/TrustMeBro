@@ -187,7 +187,8 @@
 }
 
 .time-fill--danger {
-    -unity-background-image-tint-color: #fb944d;
+    background-color: var(--color-danger);
+    -unity-background-image-tint-color: #ff6b57;
 }
 
 .time-fill--hit-flash {
@@ -201,6 +202,16 @@
     bottom: -3px;
     width: 2px;
     background-color: var(--color-white-75);
+}
+
+.activity-cue {
+    margin: 0 8px 6px 8px;
+    padding: 0;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: #a0352f;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
 }
 
 /* Subtle SLOWED chip below time bar */
@@ -428,6 +439,22 @@
     scale: 1.1 1.1;
 }
 
+.hit-marker--headshot {
+    scale: 1.55 1.55;
+}
+
+.hit-marker--headshot .hit-tick {
+    background-color: #ffcc33;
+}
+
+.hit-marker--kill {
+    scale: 1.32 1.32;
+}
+
+.hit-marker--kill .hit-tick {
+    background-color: var(--color-danger);
+}
+
 .hit-tick {
     position: absolute;
     width: 9px;
@@ -442,12 +469,48 @@
 .hit-tick--br { translate: 9px 9px;   rotate: 45deg; }
 
 /* ==========================================================================
-   4. HUD вЂ” BUFF LIST (TOP RIGHT)
+   4. HUD — CRYSTALS & BUFF LIST (TOP RIGHT)
    ========================================================================== */
+
+.crystal-counter {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 11px;
+    scale: 1 1;
+    transition-property: scale;
+    transition-duration: var(--dur-fast);
+}
+
+.crystal-counter--pop {
+    scale: 1.16 1.16;
+}
+
+.crystal-gem-icon {
+    width: 11px;
+    height: 11px;
+    rotate: 45deg;
+    margin-right: 8px;
+    background-color: #36d8f5;
+    border-width: 1px;
+    border-color: #bdf8ff #18729c #18729c #bdf8ff;
+}
+
+.crystal-count {
+    color: #18395f;
+    font-size: 16px;
+    -unity-font-style: bold;
+    min-width: 18px;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-right;
+}
 
 .buff-list {
     position: absolute;
-    top: var(--space-lg);
+    top: 68px;
     right: var(--space-lg);
     flex-direction: column;
     align-items: flex-end;
@@ -654,4 +717,38 @@
     border-width: 1px;
     border-color: #4072b4;
     border-radius: 3px;
+}
+
+.settings-dropdown {
+    width: 100%;
+    margin: 4px 0 0 0;
+}
+
+.settings-dropdown .unity-base-popup-field__input {
+    min-height: 28px;
+    padding: 3px 8px;
+    background-color: #faf8f0;
+    border-width: 1px;
+    border-color: #6e82a5;
+    border-radius: 3px;
+    color: #172a50;
+}
+
+.settings-dropdown:hover .unity-base-popup-field__input {
+    border-color: #326cd2;
+    background-color: #eef5ff;
+}
+
+.settings-dropdown:focus .unity-base-popup-field__input {
+    border-color: #215ac0;
+    border-width: 2px;
+}
+
+.settings-dropdown .unity-base-popup-field__text {
+    font-size: 12px;
+    color: #172a50;
+}
+
+.settings-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: #253656;
 }

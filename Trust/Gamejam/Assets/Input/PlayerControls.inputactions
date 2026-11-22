@@ -55,6 +55,7 @@
                 { "name": "", "id": "6b0fa826-f502-4a74-8a0e-66c910452a64", "path": "<Keyboard>/r", "groups": "Keyboard&Mouse", "action": "Reload" },
                 { "name": "", "id": "2ebbcdf1-b615-4c6e-b7d8-ebf1915a1803", "path": "<Gamepad>/buttonWest", "groups": "Gamepad", "action": "Reload" },
                 { "name": "", "id": "cfdc3cba-166c-43bd-b3fc-e473cc120058", "path": "<Keyboard>/tab", "groups": "Keyboard&Mouse", "action": "NextWeapon" },
+                { "name": "", "id": "f4c8e2a1-7b3d-4e9f-8a12-6c5d4e3f2a10", "path": "<Keyboard>/f", "groups": "Keyboard&Mouse", "action": "NextWeapon" },
                 { "name": "", "id": "08410c32-ccb6-415a-b014-2ce543606f42", "path": "<Gamepad>/dpad/right", "groups": "Gamepad", "action": "NextWeapon" },
                 { "name": "", "id": "4ee75d83-ea23-4b67-b008-cb5ec6072dd6", "path": "<Keyboard>/g", "groups": "Keyboard&Mouse", "action": "DropWeapon" },
                 { "name": "", "id": "6c20ebd1-3b2d-47a1-b932-a5601cbc9e71", "path": "<Gamepad>/dpad/down", "groups": "Gamepad", "action": "DropWeapon" },

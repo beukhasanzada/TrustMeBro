@@ -34,5 +34,12 @@ public class HealthTimeReward : MonoBehaviour
         if (rewarded) return;
         rewarded = true;
         TimeManager.Instance?.AddTime(secondsReward);
+
+        bool isBoss = health != null && health.MaxHealth >= 300f;
+        CrystalCurrencyManager.SpawnDropsForTransform(
+            transform,
+            transform.position + Vector3.up * 0.9f,
+            isBoss ? 14 : 4,
+            isBoss);
     }
 }
